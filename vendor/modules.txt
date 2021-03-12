@@ -8,6 +8,11 @@ github.com/Djarvur/go-err113
 github.com/Masterminds/semver
 # github.com/OpenPeeDeeP/depguard v1.0.1
 github.com/OpenPeeDeeP/depguard
+# github.com/alecthomas/participle/v2 v2.0.0-alpha3
+## explicit
+github.com/alecthomas/participle/v2
+github.com/alecthomas/participle/v2/lexer
+github.com/alecthomas/participle/v2/lexer/stateful
 # github.com/alexkohler/prealloc v1.0.0
 github.com/alexkohler/prealloc/pkg
 # github.com/ashanbrown/forbidigo v1.1.0
