@@ -27,14 +27,15 @@ const (
 	OpGR
 )
 
-var operators = map[string]Operator{
+var operators = map[string]Operator{ // nolint:gochecknoglobals // just once
 	"EQ": OpEQ,
 	"LE": OpLE,
 	"GR": OpGR,
 }
 
-func (o *Operator) Capture(s []string) error {
+func (o *Operator) Capture(s []string) error { // nolint:unparam // not carry
 	*o = operators[s[0]]
+
 	return nil
 }
 
@@ -55,27 +56,30 @@ type Set struct {
 
 func (s *Set) String() string {
 	var res string
+
 	if s.File != nil {
 		res += *s.File
 	} else if s.SubExpression != nil {
 		res += fmt.Sprintf("%+v", s.SubExpression)
 	}
+
 	return res
 }
 
 func Parse(s string) (*Expression, error) {
 	l := stateful.MustSimple([]stateful.Rule{
-		{"Positive", `[0-9]\d*`, nil},
-		{"File", `[a-zA-Z]\.\w*`, nil},
-		{"Operator", LexerOperator(), nil},
-		{"Bracket", `\[|\]`, nil},
-		{"Whitespace", `[ \t\n\r]+`, nil},
+		{Name: "Positive", Pattern: `[0-9]\d*`},
+		{Name: "File", Pattern: `[a-zA-Z]\.\w*`},
+		{Name: "Operator", Pattern: LexerOperator()},
+		{Name: "Bracket", Pattern: `\[|\]`},
+		{Name: "Whitespace", Pattern: `[ \t\n\r]+`},
 	})
+
 	parser := participle.MustBuild(&Expression{}, participle.Lexer(l), participle.Elide("Whitespace"))
 
 	out := &Expression{}
 	if err := parser.ParseString("", s, out); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse string: %w", err)
 	}
 
 	return out, nil
@@ -83,6 +87,7 @@ func Parse(s string) (*Expression, error) {
 
 func ScanInt(scanner *bufio.Scanner) (int, error) {
 	cont := scanner.Scan()
+
 	if err := scanner.Err(); err != nil {
 		return 0, fmt.Errorf("scanner: %w", err)
 	}
@@ -124,24 +129,25 @@ func ReadInts(r io.Reader) ([]int, error) {
 func main() {
 	expr, err := Parse(`[ LE 3 a.txt b.txt c.txt [ GR 1 d.txt e.txt ] [ EQ 2 f.txt [ LE 1 g.txt h.txt ] ] ]`)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	log.Printf("%+v", expr)
 
 	fa, err := os.Open("test/a.txt")
 	if err != nil {
-		log.Fatalf("open file: %v", err)
+		log.Panicf("open file: %v", err)
 	}
+
 	defer func() {
-		if err := fa.Close(); err != nil {
-			log.Printf("failed to close file: %v", err)
+		if errClose := fa.Close(); errClose != nil {
+			log.Printf("failed to close file: %v", errClose)
 		}
 	}()
 
 	intsA, err := ReadInts(fa)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	log.Println(intsA)

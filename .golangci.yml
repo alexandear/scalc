@@ -31,9 +31,13 @@ linters:
     - goerr113
     - maligned
     - interfacer
+    - exhaustivestruct
 
 issues:
   exclude-rules:
     - linters:
         - lll
       source: "^//go:generate "
+    - linters:
+        - govet
+      text: "structtag: struct field tag"
