@@ -171,6 +171,9 @@ func TestParse(t *testing.T) {
 			"negative N": {
 				str: `[ GR -2 a.txt ]`,
 			},
+			"zero N": {
+				str: `[ GR 0 a.txt ]`,
+			},
 			"wrong operator": {
 				str: `[ IN 2 a.txt ]`,
 			},
