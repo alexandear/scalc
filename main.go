@@ -1,60 +1,66 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/alecthomas/participle/v2"
 	"github.com/alecthomas/participle/v2/lexer/stateful"
 )
 
-type OpType string
+type Expression struct {
+	Operator Operator `"[" @Operator`
+	N        uint     `@Positive`
+	Sets     []*Set   `@@+ "]"`
+}
+
+type Operator int
 
 const (
-	OpEQ OpType = "EQ"
-	OpLE OpType = "LE"
-	OpGR OpType = "GR"
+	OpEQ Operator = iota
+	OpLE
+	OpGR
 )
 
+var operators = map[string]Operator{
+	"EQ": OpEQ,
+	"LE": OpLE,
+	"GR": OpGR,
+}
+
+func (o *Operator) Capture(s []string) error {
+	*o = operators[s[0]]
+	return nil
+}
+
 func LexerOperator() string {
-	operations := []OpType{OpEQ, OpLE, OpGR}
-
 	var res string
-	for i, op := range operations {
-		res += string(op)
 
-		if i != len(operations)-1 {
-			res += "|"
-		}
+	for str := range operators {
+		res += str + "|"
 	}
 
-	return res
-}
-
-type Expression struct {
-	Set Set `"[" @@+ "]"`
-}
-
-type N struct {
-	PositiveNumber int `@PositiveNumber`
-}
-
-type File struct {
-	File string `@File`
-}
-
-type Operation struct {
-	Type OpType `@Operator`
+	return res[:len(res)-1]
 }
 
 type Set struct {
-	Operation Operation `@@`
-	N         N         `@@`
-	Files     []File    `@@+`
+	File          *string     `  @File`
+	SubExpression *Expression `| @@`
 }
 
-func main() {
+func (s *Set) String() string {
+	var res string
+	if s.File != nil {
+		res += *s.File
+	} else if s.SubExpression != nil {
+		res += fmt.Sprintf("%+v", s.SubExpression)
+	}
+	return res
+}
+
+func Parse(s string) (*Expression, error) {
 	l := stateful.MustSimple([]stateful.Rule{
-		{"PositiveNumber", `[0-9]\d*`, nil},
+		{"Positive", `[0-9]\d*`, nil},
 		{"File", `[a-zA-Z]\.\w*`, nil},
 		{"Operator", LexerOperator(), nil},
 		{"Bracket", `\[|\]`, nil},
@@ -63,9 +69,18 @@ func main() {
 	parser := participle.MustBuild(&Expression{}, participle.Lexer(l), participle.Elide("Whitespace"))
 
 	out := &Expression{}
-	if err := parser.ParseString("", `[LE 2 d.txt [ GR 2 a.txt b.txt c.txt ] ]`, out); err != nil {
+	if err := parser.ParseString("", s, out); err != nil {
+		return nil, err
+	}
+
+	return out, nil
+}
+
+func main() {
+	expr, err := Parse(`[LE 2 a.txt b.txt c.txt [GR 2 d.txt] [EQ 3 e.txt]]`)
+	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Printf("%+v", *out)
+	log.Printf("%+v", expr)
 }
