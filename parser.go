@@ -8,9 +8,9 @@ import (
 )
 
 type Expression struct {
-	Operator Operator `"[" @Operator`
-	N        uint     `@Positive`
-	Sets     []*Set   `@@+ "]"`
+	Operator Operator `parser:"\"[\" @Operator"`
+	N        uint     `parser:"      @Positive"`
+	Sets     []*Set   `parser:"      @@+ \"]\""`
 }
 
 type Operator int
@@ -44,8 +44,8 @@ func LexerOperator() string {
 }
 
 type Set struct {
-	File          *string     `  @File`
-	SubExpression *Expression `| @@`
+	File          *string     `parser:"  @File"`
+	SubExpression *Expression `parser:"| @@"`
 }
 
 func (s *Set) String() string {

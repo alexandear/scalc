@@ -38,6 +38,3 @@ issues:
     - linters:
         - lll
       source: "^//go:generate "
-    - linters:
-        - govet
-      text: "structtag: struct field tag"
