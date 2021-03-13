@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/alecthomas/participle/v2"
@@ -13,35 +14,13 @@ type Expression struct {
 	Sets     []*Set   `parser:"      @@+ \"]\""`
 }
 
-type Operator int
+type Operator string
 
 const (
-	OpEQ Operator = iota
-	OpLE
-	OpGR
+	OpEQ Operator = "EQ"
+	OpLE Operator = "LE"
+	OpGR Operator = "GR"
 )
-
-var operators = map[string]Operator{ // nolint:gochecknoglobals // just once
-	"EQ": OpEQ,
-	"LE": OpLE,
-	"GR": OpGR,
-}
-
-func (o *Operator) Capture(s []string) error { // nolint:unparam // not carry
-	*o = operators[s[0]]
-
-	return nil
-}
-
-func LexerOperator() string {
-	var res string
-
-	for str := range operators {
-		res += str + "|"
-	}
-
-	return res[:len(res)-1]
-}
 
 type Set struct {
 	File          *string     `parser:"  @File"`
@@ -60,19 +39,31 @@ func (s *Set) String() string {
 	return res
 }
 
-func Parse(s string) (*Expression, error) {
+type Parser struct {
+	parser *participle.Parser
+}
+
+func NewParser() *Parser {
 	l := stateful.MustSimple([]stateful.Rule{
 		{Name: "Positive", Pattern: `[0-9]\d*`},
 		{Name: "File", Pattern: `[a-zA-Z]\.\w*`},
-		{Name: "Operator", Pattern: LexerOperator()},
+		{Name: "Operator", Pattern: `EQ|LE|GR`},
 		{Name: "Bracket", Pattern: `\[|\]`},
 		{Name: "Whitespace", Pattern: `[ \t\n\r]+`},
 	})
 
 	parser := participle.MustBuild(&Expression{}, participle.Lexer(l), participle.Elide("Whitespace"))
 
+	return &Parser{parser: parser}
+}
+
+func (p *Parser) Parse(s string) (*Expression, error) {
+	if p.parser == nil {
+		return nil, errors.New("parser must be created with NewParser func")
+	}
+
 	out := &Expression{}
-	if err := parser.ParseString("", s, out); err != nil {
+	if err := p.parser.ParseString("", s, out); err != nil {
 		return nil, fmt.Errorf("failed to parse string: %w", err)
 	}
 

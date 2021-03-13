@@ -139,7 +139,9 @@ func TestParse(t *testing.T) {
 			},
 		} {
 			t.Run(name, func(t *testing.T) {
-				actual, err := Parse(tc.str)
+				parser := NewParser()
+
+				actual, err := parser.Parse(tc.str)
 
 				require.NoError(t, err)
 				assert.Equal(t, tc.expected, actual)
@@ -180,7 +182,9 @@ func TestParse(t *testing.T) {
 			},
 		} {
 			t.Run(name, func(t *testing.T) {
-				actual, err := Parse(tc.str)
+				parser := NewParser()
+
+				actual, err := parser.Parse(tc.str)
 
 				assert.Error(t, err)
 				assert.Nil(t, actual)
