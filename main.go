@@ -77,7 +77,7 @@ func Parse(s string) (*Expression, error) {
 }
 
 func main() {
-	expr, err := Parse(`[LE 2 a.txt b.txt c.txt [GR 2 d.txt] [EQ 3 e.txt]]`)
+	expr, err := Parse(`[ LE 3 a.txt b.txt c.txt [ GR 1 d.txt e.txt ] [ EQ 2 f.txt [ LE 1 g.txt h.txt ] ] ]`)
 	if err != nil {
 		log.Fatal(err)
 	}
