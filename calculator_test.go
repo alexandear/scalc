@@ -37,6 +37,24 @@ func TestPerformOperation(t *testing.T) {
 			sets:     [][]int{{1, 2, 3}, {1, 2, 3}, {2, 3, 4}},
 			expected: []int{2, 3},
 		},
+		"GR 1": {
+			opFunc:   OpFuncGR,
+			n:        1,
+			sets:     [][]int{{1, 2, 4, 5, 6}, {-1, 0, 3, 5}, {1, 6, 7, 8, 9, 10}},
+			expected: []int{1, 5, 6},
+		},
+		"EQ 1": {
+			opFunc:   OpFuncEQ,
+			n:        1,
+			sets:     [][]int{{1, 2, 4, 5, 6}, {-1, 0, 3, 5}, {1, 6, 7, 8, 9, 10}},
+			expected: []int{-1, 0, 2, 3, 4, 7, 8, 9, 10},
+		},
+		"LE 2": {
+			opFunc:   OpFuncLE,
+			n:        2,
+			sets:     [][]int{{1, 2, 4, 5, 6}, {-1, 0, 3, 5}, {1, 6, 7, 8, 9, 10}},
+			expected: []int{-1, 0, 2, 3, 4, 7, 8, 9, 10},
+		},
 	} {
 		t.Run(name, func(t *testing.T) {
 			actual := PerformOperation(tc.opFunc, tc.n, tc.sets...)
