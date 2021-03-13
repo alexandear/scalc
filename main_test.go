@@ -54,6 +54,17 @@ func TestParse(t *testing.T) {
 					},
 				},
 			},
+			"spaces": {
+				str: ` [GR  1 a.txt     c.txt  ]   `,
+				expected: &Expression{
+					Operator: OpGR,
+					N:        1,
+					Sets: []*Set{
+						{File: newFile("a.txt")},
+						{File: newFile("c.txt")},
+					},
+				},
+			},
 			"predefined 1 expression": {
 				str: `[ GR 1 c.txt [ EQ 3 a.txt a.txt b.txt ] ]`,
 				expected: &Expression{
