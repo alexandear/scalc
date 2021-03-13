@@ -1,8 +1,13 @@
 package main
 
 import (
+	"bufio"
+	"errors"
 	"fmt"
+	"io"
 	"log"
+	"os"
+	"strconv"
 
 	"github.com/alecthomas/participle/v2"
 	"github.com/alecthomas/participle/v2/lexer/stateful"
@@ -76,6 +81,46 @@ func Parse(s string) (*Expression, error) {
 	return out, nil
 }
 
+func ScanInt(scanner *bufio.Scanner) (int, error) {
+	cont := scanner.Scan()
+	if err := scanner.Err(); err != nil {
+		return 0, fmt.Errorf("scanner: %w", err)
+	}
+
+	if scanner.Text() == "" {
+		return 0, io.EOF
+	}
+
+	number, err := strconv.Atoi(scanner.Text())
+	if err != nil {
+		return 0, fmt.Errorf("not an integer: %w", err)
+	}
+
+	if !cont {
+		return number, io.EOF
+	}
+
+	return number, nil
+}
+
+func ReadInts(r io.Reader) ([]int, error) {
+	scanner := bufio.NewScanner(r)
+	scanner.Split(bufio.ScanLines)
+
+	var res []int
+
+	for {
+		n, err := ScanInt(scanner)
+		if errors.Is(err, io.EOF) {
+			return res, nil
+		} else if err != nil {
+			return []int{}, fmt.Errorf("scan: %w", err)
+		}
+
+		res = append(res, n)
+	}
+}
+
 func main() {
 	expr, err := Parse(`[ LE 3 a.txt b.txt c.txt [ GR 1 d.txt e.txt ] [ EQ 2 f.txt [ LE 1 g.txt h.txt ] ] ]`)
 	if err != nil {
@@ -83,4 +128,21 @@ func main() {
 	}
 
 	log.Printf("%+v", expr)
+
+	fa, err := os.Open("test/a.txt")
+	if err != nil {
+		log.Fatalf("open file: %v", err)
+	}
+	defer func() {
+		if err := fa.Close(); err != nil {
+			log.Printf("failed to close file: %v", err)
+		}
+	}()
+
+	intsA, err := ReadInts(fa)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println(intsA)
 }
