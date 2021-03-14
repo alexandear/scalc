@@ -50,22 +50,25 @@ func newSlice(s []int) *iterableSlice {
 	return &iterableSlice{-1, s}
 }
 
-// An IntHeap is a min-heap of ints.
-type IntHeap []int
-
-func (h IntHeap) Len() int { return len(h) }
-
-func (h IntHeap) Less(i, j int) bool { return h[i] < h[j] }
-
-func (h IntHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
-
-func (h *IntHeap) Push(x interface{}) {
-	// Push and Pop use pointer receivers because they modify the slice's length,
-	// not just its contents.
-	*h = append(*h, x.(int))
+type ValueIdx struct {
+	Value int
+	Idx   int
 }
 
-func (h *IntHeap) Pop() interface{} {
+// KeyValueHeap is a min-heap of ValueIdx values comparing by Value.
+type ValueIdxHeap []ValueIdx
+
+func (h ValueIdxHeap) Len() int { return len(h) }
+
+func (h ValueIdxHeap) Less(i, j int) bool { return h[i].Value < h[j].Value }
+
+func (h ValueIdxHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
+
+func (h *ValueIdxHeap) Push(x interface{}) {
+	*h = append(*h, x.(ValueIdx))
+}
+
+func (h *ValueIdxHeap) Pop() interface{} {
 	old := *h
 	n := len(old)
 	x := old[n-1]
@@ -93,13 +96,8 @@ func PerformOperationEf(opFunc func(cnt, n uint) bool, n uint, sets ...*iterable
 		return res
 	}
 
-	res := make([]int, 0)
-
-	line := make([]int, len(sets))
-	exist := make([]bool, len(sets))
-
-	small := &IntHeap{}
-	heap.Init(small)
+	valueIdxMin := &ValueIdxHeap{}
+	heap.Init(valueIdxMin)
 
 	for i, set := range sets {
 		v, ok := set.Next()
@@ -107,101 +105,68 @@ func PerformOperationEf(opFunc func(cnt, n uint) bool, n uint, sets ...*iterable
 			continue
 		}
 
-		line[i] = v
-		heap.Push(small, v)
-		exist[i] = true
+		heap.Push(valueIdxMin, ValueIdx{
+			Value: v,
+			Idx:   i,
+		})
 	}
 
-	smallest := (*small)[0]
+	smallest := (*valueIdxMin)[0]
 
-	var cnt uint
+	popped := []ValueIdx{heap.Pop(valueIdxMin).(ValueIdx)}
+	cnt := uint(1)
 
-	for pop := heap.Pop(small).(int); pop != smallest; {
+	for valueIdxMin.Len() != 0 && (*valueIdxMin)[0].Value == smallest.Value {
+		popped = append(popped, heap.Pop(valueIdxMin).(ValueIdx))
+
 		cnt++
 	}
 
-	if cnt < n {
-		res = append(res, smallest)
+	res := make([]int, 0)
+
+	if opFunc(cnt, n) {
+		res = append(res, smallest.Value)
 	}
 
-	idx := make([]bool, len(sets))
-
-	for i, l := range line {
-		if l == smallest {
-			idx[i] = true
-		}
-	}
-
-	atLeastOnceExist := false
-
-	for _, e := range exist {
-		if e {
-			atLeastOnceExist = true
-
-			break
-		}
-	}
-
-	if !atLeastOnceExist {
+	if len(popped) == 0 {
 		return res
 	}
 
 	for {
-		for i, id := range idx {
-			if !id {
-				continue
-			}
-
-			v, ok := sets[i].Next()
+		for _, p := range popped {
+			v, ok := sets[p.Idx].Next()
 			if !ok {
-				exist[i] = false
-
 				continue
 			}
 
-			heap.Push(small, v)
-			line[i] = v
+			heap.Push(valueIdxMin, ValueIdx{
+				Value: v,
+				Idx:   p.Idx,
+			})
 		}
 
-		if small.Len() == 0 {
+		if valueIdxMin.Len() == 0 {
 			return res
 		}
 
-		smallest = (*small)[0]
+		smallest = (*valueIdxMin)[0]
 
-		var cnt uint
+		popped = []ValueIdx{heap.Pop(valueIdxMin).(ValueIdx)}
+		cnt = uint(1)
 
-		for pop := heap.Pop(small).(int); pop != smallest; {
+		for valueIdxMin.Len() != 0 && (*valueIdxMin)[0].Value == smallest.Value {
+			popped = append(popped, heap.Pop(valueIdxMin).(ValueIdx))
+
 			cnt++
 		}
 
 		if opFunc(cnt, n) {
-			res = append(res, smallest)
+			res = append(res, smallest.Value)
 		}
 
-		idx = make([]bool, len(sets))
-
-		for i, l := range line {
-			if l == smallest {
-				idx[i] = true
-			}
+		if len(popped) == 0 {
+			return res
 		}
-
-		atLeastOnceExist = false
-
-		for _, e := range exist {
-			if e {
-				atLeastOnceExist = true
-
-				break
-			}
-		}
-
-		if atLeastOnceExist {
-			continue
-		}
-
-		return res
 	}
 }
 
