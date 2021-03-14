@@ -141,6 +141,24 @@ func TestPerformOperationEf(t *testing.T) {
 			},
 			expected: []int{-1, 0, 2, 3, 4, 7, 8, 9, 10},
 		},
+		"GR N=1 two sets first has less size than a second": {
+			opFunc: OpFuncGR,
+			n:      1,
+			sets: []*iterableSlice{
+				newSlice([]int{2, 3, 4}),
+				newSlice([]int{1, 2, 3, 4, 5}),
+			},
+			expected: []int{2, 3, 4},
+		},
+		"GR N=1 two sets second has less size than a first": {
+			opFunc: OpFuncGR,
+			n:      1,
+			sets: []*iterableSlice{
+				newSlice([]int{1, 2, 3, 4, 5}),
+				newSlice([]int{2, 3}),
+			},
+			expected: []int{2, 3},
+		},
 		"GR N=1 three sets": {
 			opFunc: OpFuncGR,
 			n:      1,
@@ -150,6 +168,32 @@ func TestPerformOperationEf(t *testing.T) {
 				newSlice([]int{1, 6, 7, 8, 9, 10}),
 			},
 			expected: []int{1, 5, 6},
+		},
+		"EQ N=1 one set": {
+			opFunc:   OpFuncEQ,
+			n:        1,
+			sets:     []*iterableSlice{newSlice([]int{1, 2, 3})},
+			expected: []int{1, 2, 3},
+		},
+		"EQ N=3 three sets": {
+			opFunc: OpFuncEQ,
+			n:      3,
+			sets: []*iterableSlice{
+				newSlice([]int{1, 2, 3}),
+				newSlice([]int{1, 2, 3}),
+				newSlice([]int{2, 3}),
+			},
+			expected: []int{2, 3},
+		},
+		"EQ N=1 three sets": {
+			opFunc: OpFuncEQ,
+			n:      1,
+			sets: []*iterableSlice{
+				newSlice([]int{1, 2, 4, 5, 6}),
+				newSlice([]int{-1, 0, 3, 5}),
+				newSlice([]int{1, 6, 7, 8, 9, 10}),
+			},
+			expected: []int{-1, 0, 2, 3, 4, 7, 8, 9, 10},
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
