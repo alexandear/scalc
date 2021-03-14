@@ -73,6 +73,7 @@ func (h *ValueIdxHeap) Pop() interface{} {
 	n := len(old)
 	x := old[n-1]
 	*h = old[0 : n-1]
+
 	return x
 }
 
@@ -96,78 +97,49 @@ func PerformOperationEf(opFunc func(cnt, n uint) bool, n uint, sets ...*iterable
 		return res
 	}
 
-	valueIdxMin := &ValueIdxHeap{}
-	heap.Init(valueIdxMin)
-
-	for i, set := range sets {
-		v, ok := set.Next()
-		if !ok {
-			continue
-		}
-
-		heap.Push(valueIdxMin, ValueIdx{
-			Value: v,
-			Idx:   i,
-		})
+	minValueIdxes := make([]ValueIdx, 0, len(sets))
+	for i := range sets {
+		minValueIdxes = append(minValueIdxes, ValueIdx{Idx: i})
 	}
 
-	smallest := (*valueIdxMin)[0]
+	var (
+		result       []int
+		valueIdxHeap ValueIdxHeap
+	)
 
-	popped := []ValueIdx{heap.Pop(valueIdxMin).(ValueIdx)}
-	cnt := uint(1)
+	heap.Init(&valueIdxHeap)
 
-	for valueIdxMin.Len() != 0 && (*valueIdxMin)[0].Value == smallest.Value {
-		popped = append(popped, heap.Pop(valueIdxMin).(ValueIdx))
-
-		cnt++
-	}
-
-	res := make([]int, 0)
-
-	if opFunc(cnt, n) {
-		res = append(res, smallest.Value)
-	}
-
-	if len(popped) == 0 {
-		return res
-	}
-
-	for {
-		for _, p := range popped {
+	for len(minValueIdxes) != 0 {
+		for _, p := range minValueIdxes {
 			v, ok := sets[p.Idx].Next()
 			if !ok {
 				continue
 			}
 
-			heap.Push(valueIdxMin, ValueIdx{
+			heap.Push(&valueIdxHeap, ValueIdx{
 				Value: v,
 				Idx:   p.Idx,
 			})
 		}
 
-		if valueIdxMin.Len() == 0 {
-			return res
+		if valueIdxHeap.Len() == 0 {
+			return result
 		}
 
-		smallest = (*valueIdxMin)[0]
+		min := valueIdxHeap[0]
 
-		popped = []ValueIdx{heap.Pop(valueIdxMin).(ValueIdx)}
-		cnt = uint(1)
+		var cnt uint
 
-		for valueIdxMin.Len() != 0 && (*valueIdxMin)[0].Value == smallest.Value {
-			popped = append(popped, heap.Pop(valueIdxMin).(ValueIdx))
-
-			cnt++
+		for ; valueIdxHeap.Len() != 0 && valueIdxHeap[0].Value == min.Value; cnt++ {
+			minValueIdxes = append(minValueIdxes, heap.Pop(&valueIdxHeap).(ValueIdx))
 		}
 
 		if opFunc(cnt, n) {
-			res = append(res, smallest.Value)
-		}
-
-		if len(popped) == 0 {
-			return res
+			result = append(result, min.Value)
 		}
 	}
+
+	return result
 }
 
 func OpFuncEQ(cnt, n uint) bool {
