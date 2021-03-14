@@ -1,7 +1,7 @@
 package main
 
 import (
-	"math"
+	"container/heap"
 	"sort"
 )
 
@@ -50,6 +50,29 @@ func newSlice(s []int) *iterableSlice {
 	return &iterableSlice{-1, s}
 }
 
+// An IntHeap is a min-heap of ints.
+type IntHeap []int
+
+func (h IntHeap) Len() int { return len(h) }
+
+func (h IntHeap) Less(i, j int) bool { return h[i] < h[j] }
+
+func (h IntHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
+
+func (h *IntHeap) Push(x interface{}) {
+	// Push and Pop use pointer receivers because they modify the slice's length,
+	// not just its contents.
+	*h = append(*h, x.(int))
+}
+
+func (h *IntHeap) Pop() interface{} {
+	old := *h
+	n := len(old)
+	x := old[n-1]
+	*h = old[0 : n-1]
+	return x
+}
+
 func PerformOperationEf(opFunc func(cnt, n uint) bool, n uint, sets ...*iterableSlice) []int {
 	if n == 1 {
 		return []int{}
@@ -75,6 +98,9 @@ func PerformOperationEf(opFunc func(cnt, n uint) bool, n uint, sets ...*iterable
 	line := make([]int, len(sets))
 	exist := make([]bool, len(sets))
 
+	small := &IntHeap{}
+	heap.Init(small)
+
 	for i, set := range sets {
 		v, ok := set.Next()
 		if !ok {
@@ -82,23 +108,16 @@ func PerformOperationEf(opFunc func(cnt, n uint) bool, n uint, sets ...*iterable
 		}
 
 		line[i] = v
+		heap.Push(small, v)
 		exist[i] = true
 	}
 
-	smallest := math.MaxInt32
-
-	for _, l := range line {
-		if l < smallest {
-			smallest = l
-		}
-	}
+	smallest := (*small)[0]
 
 	var cnt uint
 
-	for _, l := range line {
-		if l == smallest {
-			cnt++
-		}
+	for pop := heap.Pop(small).(int); pop != smallest; {
+		cnt++
 	}
 
 	if cnt < n {
@@ -140,28 +159,20 @@ func PerformOperationEf(opFunc func(cnt, n uint) bool, n uint, sets ...*iterable
 				continue
 			}
 
+			heap.Push(small, v)
 			line[i] = v
 		}
 
-		smallest = math.MaxInt32
-		for i, l := range line {
-			if l < smallest {
-				if exist[i] {
-					smallest = l
-				}
-			}
-		}
-
-		if smallest == math.MaxInt32 {
+		if small.Len() == 0 {
 			return res
 		}
 
-		cnt = 0
+		smallest = (*small)[0]
 
-		for _, l := range line {
-			if l == smallest {
-				cnt++
-			}
+		var cnt uint
+
+		for pop := heap.Pop(small).(int); pop != smallest; {
+			cnt++
 		}
 
 		if opFunc(cnt, n) {
