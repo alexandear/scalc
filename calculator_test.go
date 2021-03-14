@@ -13,6 +13,18 @@ func TestPerformOperation(t *testing.T) {
 		sets     [][]int
 		expected []int
 	}{
+		"LE N=1 one set": {
+			opFunc:   OpFuncLE,
+			n:        1,
+			sets:     [][]int{{1, 2, 3}},
+			expected: []int{},
+		},
+		"LE N>1 one set": {
+			opFunc:   OpFuncLE,
+			n:        3,
+			sets:     [][]int{{1, 2, 3}},
+			expected: []int{1, 2, 3},
+		},
 		"LE 2 a": {
 			opFunc:   OpFuncLE,
 			n:        2,
@@ -58,6 +70,80 @@ func TestPerformOperation(t *testing.T) {
 	} {
 		t.Run(name, func(t *testing.T) {
 			actual := PerformOperation(tc.opFunc, tc.n, tc.sets...)
+
+			assert.Equal(t, tc.expected, actual)
+		})
+	}
+}
+
+func TestPerformOperationEf(t *testing.T) {
+	for name, tc := range map[string]struct {
+		opFunc   func(idx, n uint) bool
+		n        uint
+		sets     []*iterableSlice
+		expected []int
+	}{
+		"LE N=1 one set": {
+			opFunc:   OpFuncLE,
+			n:        1,
+			sets:     []*iterableSlice{newSlice([]int{1, 2, 3})},
+			expected: []int{},
+		},
+		"LE N=1 two sets": {
+			opFunc: OpFuncLE,
+			n:      1,
+			sets: []*iterableSlice{
+				newSlice([]int{1, 2, 3}),
+				newSlice([]int{2, 3, 4}),
+			},
+			expected: []int{},
+		},
+		"LE N>1 one set": {
+			opFunc:   OpFuncLE,
+			n:        3,
+			sets:     []*iterableSlice{newSlice([]int{1, 2, 3})},
+			expected: []int{1, 2, 3},
+		},
+		"LE N=2 two sets equal size": {
+			opFunc: OpFuncLE,
+			n:      2,
+			sets: []*iterableSlice{
+				newSlice([]int{1, 2, 3}),
+				newSlice([]int{2, 3, 4}),
+			},
+			expected: []int{1, 4},
+		},
+		"LE N=2 two sets small size=1": {
+			opFunc: OpFuncLE,
+			n:      2,
+			sets: []*iterableSlice{
+				newSlice([]int{1}),
+				newSlice([]int{2}),
+			},
+			expected: []int{1, 2},
+		},
+		"LE N=2 two sets different size": {
+			opFunc: OpFuncLE,
+			n:      2,
+			sets: []*iterableSlice{
+				newSlice([]int{1}),
+				newSlice([]int{2, 3}),
+			},
+			expected: []int{1, 2, 3},
+		},
+		"LE N=2 tree sets": {
+			opFunc: OpFuncLE,
+			n:      2,
+			sets: []*iterableSlice{
+				newSlice([]int{1, 2, 4, 5, 6}),
+				newSlice([]int{-1, 0, 3, 5}),
+				newSlice([]int{1, 6, 7, 8, 9, 10}),
+			},
+			expected: []int{-1, 0, 2, 3, 4, 7, 8, 9, 10},
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			actual := PerformOperationEf(tc.opFunc, tc.n, tc.sets...)
 
 			assert.Equal(t, tc.expected, actual)
 		})
