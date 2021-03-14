@@ -6,12 +6,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPerformOperationIn(t *testing.T) {
-	testPerformOperation(t, PerformOperationInef)
-}
-
 func TestPerformOperation(t *testing.T) {
 	testPerformOperation(t, PerformOperation)
+}
+
+func TestPerformOperationInef(t *testing.T) {
+	testPerformOperation(t, PerformOperationInef)
 }
 
 func testPerformOperation(t *testing.T, performFunc func(opFunc OpFunc, n uint, sets []Iterator) Iterator) {
@@ -25,7 +25,7 @@ func testPerformOperation(t *testing.T, performFunc func(opFunc OpFunc, n uint, 
 			opFunc:   OpFuncLE,
 			n:        1,
 			sets:     []Iterator{NewIterableSlice([]int{1, 2, 3})},
-			expected: NewIterableSlice([]int{}),
+			expected: NewIterableSlice(nil),
 		},
 		"LE N=1 two sets": {
 			opFunc: OpFuncLE,
@@ -34,7 +34,7 @@ func testPerformOperation(t *testing.T, performFunc func(opFunc OpFunc, n uint, 
 				NewIterableSlice([]int{1, 2, 3}),
 				NewIterableSlice([]int{2, 3, 4}),
 			},
-			expected: NewIterableSlice([]int{}),
+			expected: NewIterableSlice(nil),
 		},
 		"LE N>1 one set": {
 			opFunc:   OpFuncLE,

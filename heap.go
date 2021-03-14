@@ -1,19 +1,19 @@
 package main
 
-// ValueIdxHeap is a min-heap of ValueIdx values comparing by ValueIdx.Value.
-type ValueIdxHeap []ValueIdx
+// PairHeap is a min-heap of Pair values comparing by Pair.Value.
+type PairHeap []Pair
 
-func (h ValueIdxHeap) Len() int { return len(h) }
+func (h PairHeap) Len() int { return len(h) }
 
-func (h ValueIdxHeap) Less(i, j int) bool { return h[i].Value < h[j].Value }
+func (h PairHeap) Less(i, j int) bool { return h[i].Value < h[j].Value }
 
-func (h ValueIdxHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
+func (h PairHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
 
-func (h *ValueIdxHeap) Push(x interface{}) {
-	*h = append(*h, x.(ValueIdx))
+func (h *PairHeap) Push(x interface{}) {
+	*h = append(*h, x.(Pair))
 }
 
-func (h *ValueIdxHeap) Pop() interface{} {
+func (h *PairHeap) Pop() interface{} {
 	old := *h
 	n := len(old)
 	x := old[n-1]

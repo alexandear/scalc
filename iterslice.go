@@ -6,6 +6,10 @@ type IterableSlice struct {
 }
 
 func NewIterableSlice(s []int) *IterableSlice {
+	if s == nil {
+		s = []int{}
+	}
+
 	return &IterableSlice{-1, s}
 }
 
