@@ -78,34 +78,13 @@ func (h *ValueIdxHeap) Pop() interface{} {
 }
 
 func PerformOperationEf(opFunc func(cnt, n uint) bool, n uint, sets ...*iterableSlice) []int {
-	if n == 1 {
-		return []int{}
-	}
-
-	if len(sets) == 1 {
-		var res []int
-
-		for {
-			v, ok := sets[0].Next()
-			if !ok {
-				break
-			}
-
-			res = append(res, v)
-		}
-
-		return res
-	}
-
 	minValueIdxes := make([]ValueIdx, 0, len(sets))
 	for i := range sets {
 		minValueIdxes = append(minValueIdxes, ValueIdx{Idx: i})
 	}
 
-	var (
-		result       []int
-		valueIdxHeap ValueIdxHeap
-	)
+	result := make([]int, 0)
+	var valueIdxHeap ValueIdxHeap
 
 	heap.Init(&valueIdxHeap)
 

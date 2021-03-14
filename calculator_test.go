@@ -131,7 +131,7 @@ func TestPerformOperationEf(t *testing.T) {
 			},
 			expected: []int{1, 2, 3},
 		},
-		"LE N=2 tree sets": {
+		"LE N=2 three sets": {
 			opFunc: OpFuncLE,
 			n:      2,
 			sets: []*iterableSlice{
@@ -140,6 +140,16 @@ func TestPerformOperationEf(t *testing.T) {
 				newSlice([]int{1, 6, 7, 8, 9, 10}),
 			},
 			expected: []int{-1, 0, 2, 3, 4, 7, 8, 9, 10},
+		},
+		"GR N=1 three sets": {
+			opFunc: OpFuncGR,
+			n:      1,
+			sets: []*iterableSlice{
+				newSlice([]int{1, 2, 4, 5, 6}),
+				newSlice([]int{-1, 0, 3, 5}),
+				newSlice([]int{1, 6, 7, 8, 9, 10}),
+			},
+			expected: []int{1, 5, 6},
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
