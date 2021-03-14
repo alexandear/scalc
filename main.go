@@ -21,16 +21,7 @@ func main() {
 		log.Panicf("open file: %v", err)
 	}
 
-	defer func() {
-		if errClose := fa.Close(); errClose != nil {
-			log.Printf("failed to close file: %v", errClose)
-		}
-	}()
-
-	intsA, err := ReadInts(fa)
-	if err != nil {
-		log.Panic(err)
+	if errClose := fa.Close(); errClose != nil {
+		log.Printf("failed to close file: %v", errClose)
 	}
-
-	log.Println(intsA)
 }

@@ -25,7 +25,7 @@ func TestEvaluate(t *testing.T) {
 			},
 		})
 
-		assert.Equal(t, newSlice([]int{2, 3}), actual)
+		assert.Equal(t, NewIterableSlice([]int{2, 3}), actual)
 	})
 
 	t.Run("predefined 2 expression", func(t *testing.T) {
@@ -45,6 +45,6 @@ func TestEvaluate(t *testing.T) {
 			},
 		})
 
-		assert.Equal(t, newSlice([]int{1, 4}), actual)
+		assert.Equal(t, NewIterableSlice([]int{1, 4}), actual)
 	})
 }

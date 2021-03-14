@@ -5,12 +5,35 @@ import (
 	"sort"
 )
 
-func PerformOperation(opFunc func(cnt, n uint) bool, n uint, sets ...[]int) []int {
-	counts := make(map[int]uint)
+type Iterator interface {
+	Next() (value int, ok bool)
+}
 
-	for _, set := range sets {
-		for _, number := range set {
-			counts[number]++
+type OpFunc func(cnt, n uint) bool
+
+func OpFuncEQ(cnt, n uint) bool {
+	return cnt == n
+}
+
+func OpFuncLE(cnt, n uint) bool {
+	return cnt < n
+}
+
+func OpFuncGR(cnt, n uint) bool {
+	return cnt > n
+}
+
+func PerformOperationInef(opFunc OpFunc, n uint, iters []Iterator) Iterator {
+	counts := make(map[int]uint, len(iters))
+
+	for _, iter := range iters {
+		for {
+			v, ok := iter.Next()
+			if !ok {
+				break
+			}
+
+			counts[v]++
 		}
 	}
 
@@ -24,30 +47,7 @@ func PerformOperation(opFunc func(cnt, n uint) bool, n uint, sets ...[]int) []in
 
 	sort.Ints(res)
 
-	return res
-}
-
-type intIterator interface {
-	Next() (value int, ok bool)
-}
-
-type iterableSlice struct {
-	idx int
-	s   []int
-}
-
-func (s *iterableSlice) Next() (value int, ok bool) {
-	s.idx++
-
-	if s.idx >= len(s.s) {
-		return 0, false
-	}
-
-	return s.s[s.idx], true
-}
-
-func newSlice(s []int) *iterableSlice {
-	return &iterableSlice{-1, s}
+	return NewIterableSlice(res)
 }
 
 type ValueIdx struct {
@@ -55,31 +55,9 @@ type ValueIdx struct {
 	Idx   int
 }
 
-// KeyValueHeap is a min-heap of ValueIdx values comparing by Value.
-type ValueIdxHeap []ValueIdx
-
-func (h ValueIdxHeap) Len() int { return len(h) }
-
-func (h ValueIdxHeap) Less(i, j int) bool { return h[i].Value < h[j].Value }
-
-func (h ValueIdxHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
-
-func (h *ValueIdxHeap) Push(x interface{}) {
-	*h = append(*h, x.(ValueIdx))
-}
-
-func (h *ValueIdxHeap) Pop() interface{} {
-	old := *h
-	n := len(old)
-	x := old[n-1]
-	*h = old[0 : n-1]
-
-	return x
-}
-
-func PerformOperationEf(opFunc func(cnt, n uint) bool, n uint, sets []intIterator) intIterator {
-	minValueIdxes := make([]ValueIdx, 0, len(sets))
-	for i := range sets {
+func PerformOperation(opFunc OpFunc, n uint, iters []Iterator) Iterator {
+	minValueIdxes := make([]ValueIdx, 0, len(iters))
+	for i := range iters {
 		minValueIdxes = append(minValueIdxes, ValueIdx{Idx: i})
 	}
 
@@ -91,7 +69,7 @@ func PerformOperationEf(opFunc func(cnt, n uint) bool, n uint, sets []intIterato
 
 	for len(minValueIdxes) != 0 {
 		for _, p := range minValueIdxes {
-			v, ok := sets[p.Idx].Next()
+			v, ok := iters[p.Idx].Next()
 			if !ok {
 				continue
 			}
@@ -103,7 +81,7 @@ func PerformOperationEf(opFunc func(cnt, n uint) bool, n uint, sets []intIterato
 		}
 
 		if valueIdxHeap.Len() == 0 {
-			return newSlice(result)
+			return NewIterableSlice(result)
 		}
 
 		min := valueIdxHeap[0]
@@ -119,17 +97,5 @@ func PerformOperationEf(opFunc func(cnt, n uint) bool, n uint, sets []intIterato
 		}
 	}
 
-	return newSlice(result)
-}
-
-func OpFuncEQ(cnt, n uint) bool {
-	return cnt == n
-}
-
-func OpFuncLE(cnt, n uint) bool {
-	return cnt < n
-}
-
-func OpFuncGR(cnt, n uint) bool {
-	return cnt > n
+	return NewIterableSlice(result)
 }

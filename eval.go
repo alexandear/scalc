@@ -1,15 +1,12 @@
 package main
 
 import (
-	"bufio"
-	"errors"
-	"io"
 	"log"
 	"os"
 )
 
-func Evaluate(expr *Expression) intIterator {
-	var setIters []intIterator
+func Evaluate(expr *Expression) Iterator {
+	var setIters []Iterator
 
 	for _, s := range expr.Sets {
 		switch {
@@ -23,7 +20,7 @@ func Evaluate(expr *Expression) intIterator {
 	return Calculate(expr.Operator, expr.N, setIters)
 }
 
-func Calculate(operator Operator, n uint, setIters []intIterator) intIterator {
+func Calculate(operator Operator, n uint, setIters []Iterator) Iterator {
 	opFunc := OpFuncEQ
 
 	switch operator {
@@ -36,44 +33,14 @@ func Calculate(operator Operator, n uint, setIters []intIterator) intIterator {
 	default:
 	}
 
-	return PerformOperationEf(opFunc, n, setIters)
+	return PerformOperation(opFunc, n, setIters)
 }
 
-type iterableReader struct {
-	scanner *bufio.Scanner
-	err     error
-}
-
-func (r *iterableReader) Next() (value int, ok bool) {
-	n, err := ScanInt(r.scanner)
-
-	if errors.Is(err, io.EOF) {
-		return n, false
-	} else if err != nil {
-		log.Panicf("failed to scan: %v", err)
-	}
-
-	return n, true
-}
-
-func (r *iterableReader) Err() error {
-	return r.err
-}
-
-func newIterableReader(r io.Reader) *iterableReader {
-	scanner := bufio.NewScanner(r)
-	scanner.Split(bufio.ScanLines)
-
-	return &iterableReader{
-		scanner: scanner,
-	}
-}
-
-func FileToIterator(file string) intIterator {
+func FileToIterator(file string) Iterator {
 	fa, err := os.Open(file)
 	if err != nil {
 		log.Panicf("failed to open file %s: %v", file, err)
 	}
 
-	return newIterableReader(fa)
+	return NewIterableReader(fa)
 }
