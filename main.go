@@ -6,12 +6,12 @@ import (
 	"strings"
 )
 
-func Usage(app, reason string) string {
+func usage(appName, reason string) string {
 	var res strings.Builder
 
 	res.WriteString(reason)
 	res.WriteString("\nUsage:\n")
-	res.WriteString("   " + app + " expression\n")
+	res.WriteString("   " + appName + " expression\n")
 	res.WriteString("Where:\n")
 	res.WriteString("   expression := [ operator N sets ]\n")
 	res.WriteString("   sets := set | set sets\n")
@@ -20,9 +20,9 @@ func Usage(app, reason string) string {
 	res.WriteString("   file is a file with sorted integers\n")
 	res.WriteString("   N is a positive integer\n")
 	res.WriteString("Example 1:\n")
-	res.WriteString("   " + app + " [ GR 1 c.txt [ EQ 3 a.txt a.txt b.txt ] ]\n")
+	res.WriteString("   " + appName + " [ GR 1 c.txt [ EQ 3 a.txt a.txt b.txt ] ]\n")
 	res.WriteString("Example 2:\n")
-	res.WriteString("   " + app + " [ LE 2 a.txt [ GR 1 b.txt c.txt ] ]\n")
+	res.WriteString("   " + appName + " [ LE 2 a.txt [ GR 1 b.txt c.txt ] ]\n")
 
 	return res.String()
 }
@@ -31,17 +31,15 @@ func main() {
 	appArg := os.Args[0]
 
 	if len(os.Args) <= 1 {
-		println(Usage(appArg, "Missing expression"))
-		os.Exit(1)
+		exit(usage(appArg, "Missing expression"))
 	}
 
-	expressionArg := strings.Join(os.Args[1:], " ")
+	exprArg := strings.Join(os.Args[1:], " ")
 	parser := NewParser()
 
-	expr, err := parser.Parse(expressionArg)
+	expr, err := parser.Parse(exprArg)
 	if err != nil {
-		println(Usage(appArg, fmt.Sprintf("Wrong expression \"%s\":\n   %v", expressionArg, err)))
-		os.Exit(1)
+		exit(usage(appArg, fmt.Sprintf("Wrong expression \"%s\":\n   %v", exprArg, err)))
 	}
 
 	for result := Evaluate(expr); ; {
@@ -52,4 +50,9 @@ func main() {
 
 		println(v)
 	}
+}
+
+func exit(usage string) {
+	_, _ = fmt.Fprintln(os.Stderr, usage)
+	os.Exit(1)
 }
