@@ -39,7 +39,7 @@ func Calculate(operator Operator, n uint, setIters []Iterator) Iterator {
 func FileToIterator(file string) Iterator {
 	fa, err := os.Open(file)
 	if err != nil {
-		log.Panicf("failed to open file %s: %v", file, err)
+		log.Panicf("failed to open file: %v", err)
 	}
 
 	return NewIterableReader(fa)

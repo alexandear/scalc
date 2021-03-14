@@ -42,3 +42,13 @@ IMAGE = scalc
 docker:
 	@echo docker
 	@docker build -t $(IMAGE) -f Dockerfile .
+
+.PHONY: example1
+example1: build
+	@-cp -r test/*.txt ./bin
+	cd ./bin && scalc [ GR 1 c.txt [ EQ 3 a.txt a.txt b.txt ] ]
+
+.PHONY: example2
+example2: build
+	@-cp -r test/*.txt ./bin
+	cd ./bin && scalc [ LE 2 a.txt [ GR 1 b.txt c.txt ] ]
