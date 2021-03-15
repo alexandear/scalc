@@ -15,7 +15,7 @@ type Parser struct {
 func NewParser() *Parser {
 	l := stateful.MustSimple([]stateful.Rule{
 		{Name: "Positive", Pattern: `^[1-9]\d*`},
-		{Name: "File", Pattern: `[a-zA-Z]\.\w*`},
+		{Name: "File", Pattern: `\w*\.\w*`},
 		{Name: "Operator", Pattern: `EQ|LE|GR`},
 		{Name: "Bracket", Pattern: `\[|\]`},
 		{Name: "Whitespace", Pattern: `[ \t\n\r]+`},

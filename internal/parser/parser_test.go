@@ -56,6 +56,17 @@ func TestParse(t *testing.T) {
 					},
 				},
 			},
+			"long filename": {
+				str: `[ EQ 2 aHuge.txt b2.txt ]`,
+				expected: &Expression{
+					Operator: scalc.OpEQ,
+					N:        2,
+					Sets: []*Set{
+						{File: newFile("aHuge.txt")},
+						{File: newFile("b2.txt")},
+					},
+				},
+			},
 			"spaces": {
 				str: ` [GR  1 a.txt     c.txt  ]   `,
 				expected: &Expression{
