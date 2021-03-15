@@ -1,34 +1,44 @@
-package scalc
+package main
 
 import (
 	"errors"
 	"fmt"
+	"io"
+	"log"
 	"os"
 	"strconv"
 	"strings"
 
+	"github.com/alexandear/scalc/internal"
 	"github.com/alexandear/scalc/pkg/scalc"
 )
 
 func Execute(args []string) (string, error) {
 	appArg := args[0]
 
-	if len(os.Args) <= 1 {
+	if len(args) <= 1 {
 		return usage(appArg), errors.New("missing expression")
 	}
 
-	exprArg := strings.Join(os.Args[1:], " ")
+	exprArg := strings.Join(args[1:], " ")
 	parser := scalc.NewParser()
-
-	expr, err := parser.Parse(exprArg)
-	if err != nil {
-		return usage(appArg), fmt.Errorf("wrong expression \"%s\": %w", exprArg, err)
-	}
 
 	var res strings.Builder
 
-	for ev := scalc.Evaluate(expr); ; {
-		v, ok := ev.Next()
+	calc := internal.NewCalculator(parser, &fileToIterator{})
+	defer func() {
+		if err := calc.Close(); err != nil {
+			log.Printf("failed to close calculator: %v", err)
+		}
+	}()
+
+	resIt, err := calc.Calculate(exprArg)
+	if err != nil {
+		return "", fmt.Errorf("failed to calculate: %w", err)
+	}
+
+	for {
+		v, ok := resIt.Next()
 		if !ok {
 			break
 		}
@@ -38,6 +48,17 @@ func Execute(args []string) (string, error) {
 	}
 
 	return res.String(), nil
+}
+
+type fileToIterator struct{}
+
+func (f *fileToIterator) Iterator(file string) (scalc.Iterator, io.Closer, error) {
+	fi, err := os.Open(file)
+	if err != nil {
+		return nil, nil, fmt.Errorf("open file: %w", err)
+	}
+
+	return internal.NewIterableReader(fi), fi, nil
 }
 
 func usage(appName string) string {

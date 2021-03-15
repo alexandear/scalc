@@ -1,4 +1,4 @@
-package scalc
+package internal
 
 import (
 	"bufio"
@@ -28,7 +28,7 @@ func (r *IterableReader) Next() (value int, ok bool) {
 	if errors.Is(err, io.EOF) {
 		return n, false
 	} else if err != nil {
-		log.Panicf("failed to scan: %v", err)
+		log.Panicf("scan fail: %v", err)
 	}
 
 	return n, true

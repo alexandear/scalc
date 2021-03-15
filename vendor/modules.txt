@@ -306,6 +306,11 @@ github.com/ultraware/funlen
 github.com/ultraware/whitespace
 # github.com/uudashr/gocognit v1.0.1
 github.com/uudashr/gocognit
+# go.uber.org/atomic v1.4.0
+go.uber.org/atomic
+# go.uber.org/multierr v1.1.0
+## explicit
+go.uber.org/multierr
 # golang.org/x/mod v0.4.0
 golang.org/x/mod/internal/lazyregexp
 golang.org/x/mod/modfile

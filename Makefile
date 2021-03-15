@@ -12,7 +12,7 @@ default: build lint test
 .PHONY: build
 build:
 	@echo build
-	@go build -o ./bin/scalc .
+	@go build -o ./bin/scalc ./cmd/...
 
 .PHONY: format
 format:

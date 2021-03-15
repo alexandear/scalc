@@ -28,7 +28,23 @@ type Pair struct {
 	Idx   int
 }
 
-func PerformOperation(opFunc OpFunc, n uint, iters []Iterator) Iterator {
+func Calculate(operator Operator, n uint, iters []Iterator) Iterator {
+	opFunc := OpFuncEQ
+
+	switch operator {
+	case OpEQ:
+		opFunc = OpFuncEQ
+	case OpLE:
+		opFunc = OpFuncLE
+	case OpGR:
+		opFunc = OpFuncGR
+	default:
+	}
+
+	return calculate(opFunc, n, iters)
+}
+
+func calculate(opFunc OpFunc, n uint, iters []Iterator) Iterator {
 	operationLine := make([]Pair, 0, len(iters))
 	for i := range iters {
 		operationLine = append(operationLine, Pair{Idx: i})
@@ -75,7 +91,7 @@ func PerformOperation(opFunc OpFunc, n uint, iters []Iterator) Iterator {
 	return NewIterableSlice(result)
 }
 
-func PerformOperationInef(opFunc OpFunc, n uint, iters []Iterator) Iterator {
+func calculateInefficient(opFunc OpFunc, n uint, iters []Iterator) Iterator {
 	counts := make(map[int]uint, len(iters))
 
 	for _, iter := range iters {

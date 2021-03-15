@@ -6,15 +6,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPerformOperation(t *testing.T) {
-	testPerformOperation(t, PerformOperation)
+func TestCalculate(t *testing.T) {
+	testCalculate(t, calculate)
 }
 
-func TestPerformOperationInef(t *testing.T) {
-	testPerformOperation(t, PerformOperationInef)
+func TestCalculateInefficient(t *testing.T) {
+	testCalculate(t, calculateInefficient)
 }
 
-func testPerformOperation(t *testing.T, performFunc func(opFunc OpFunc, n uint, sets []Iterator) Iterator) {
+func testCalculate(t *testing.T, performFunc func(opFunc OpFunc, n uint, sets []Iterator) Iterator) {
 	for name, tc := range map[string]struct {
 		opFunc   OpFunc
 		n        uint

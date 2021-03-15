@@ -8,37 +8,6 @@ import (
 	"github.com/alecthomas/participle/v2/lexer/stateful"
 )
 
-type Expression struct {
-	Operator Operator `parser:"\"[\" @Operator"`
-	N        uint     `parser:"      @Positive"`
-	Sets     []*Set   `parser:"      @@+ \"]\""`
-}
-
-type Operator string
-
-const (
-	OpEQ Operator = "EQ"
-	OpLE Operator = "LE"
-	OpGR Operator = "GR"
-)
-
-type Set struct {
-	File          *string     `parser:"  @File"`
-	SubExpression *Expression `parser:"| @@"`
-}
-
-func (s *Set) String() string {
-	var res string
-
-	if s.File != nil {
-		res += *s.File
-	} else if s.SubExpression != nil {
-		res += fmt.Sprintf("%+v", s.SubExpression)
-	}
-
-	return res
-}
-
 type Parser struct {
 	parser *participle.Parser
 }
@@ -64,7 +33,7 @@ func (p *Parser) Parse(s string) (*Expression, error) {
 
 	out := &Expression{}
 	if err := p.parser.ParseString("", s, out); err != nil {
-		return nil, fmt.Errorf("failed to parse string: %w", err)
+		return nil, fmt.Errorf("parse string: %w", err)
 	}
 
 	return out, nil
