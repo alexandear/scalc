@@ -10,6 +10,8 @@ import (
 	"github.com/alexandear/scalc/pkg/scalc"
 )
 
+//go:generate mockgen -source=$GOFILE -package mock -destination mock/interfaces.go
+
 type Parser interface {
 	Parse(s string) (*parser.Expression, error)
 }

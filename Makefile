@@ -36,6 +36,15 @@ test:
 	@echo test
 	@go test -race -v -count=1 ./...
 
+.PHONY: generate
+generate: mock
+
+.PHONY: mock
+mock:
+	@echo mock
+	@go install github.com/golang/mock/mockgen
+	@go generate ./...
+
 IMAGE = scalc
 
 .PHONY: docker

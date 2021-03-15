@@ -3,17 +3,26 @@ package calc
 import (
 	"testing"
 
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/alexandear/scalc/internal/calc/mock"
 	"github.com/alexandear/scalc/internal/parser"
 	"github.com/alexandear/scalc/pkg/scalc"
 )
 
 func Test_evaluate(t *testing.T) {
 	t.Run("predefined 1 expression", func(t *testing.T) {
-		calculator := &Calculator{}
-		defer calculator.Close()
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+		fileMock := mock.NewMockFileToIterator(ctrl)
+		calculator := NewCalculator(nil, fileMock)
+
+		fileMock.EXPECT().Iterator("a.txt").Return(scalc.NewIterableSlice([]int{1, 2, 3}), nil, nil).Times(1)
+		fileMock.EXPECT().Iterator("a.txt").Return(scalc.NewIterableSlice([]int{1, 2, 3}), nil, nil).Times(1)
+		fileMock.EXPECT().Iterator("b.txt").Return(scalc.NewIterableSlice([]int{2, 3, 4}), nil, nil).Times(1)
+		fileMock.EXPECT().Iterator("c.txt").Return(scalc.NewIterableSlice([]int{1, 2, 3, 4, 5}), nil, nil).Times(1)
 
 		actual, err := calculator.evaluate(&parser.Expression{
 			Operator: scalc.OpGR,
@@ -37,8 +46,14 @@ func Test_evaluate(t *testing.T) {
 	})
 
 	t.Run("predefined 2 expression", func(t *testing.T) {
-		calculator := &Calculator{}
-		defer calculator.Close()
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+		fileMock := mock.NewMockFileToIterator(ctrl)
+		calculator := NewCalculator(nil, fileMock)
+
+		fileMock.EXPECT().Iterator("a.txt").Return(scalc.NewIterableSlice([]int{1, 2, 3}), nil, nil).Times(1)
+		fileMock.EXPECT().Iterator("b.txt").Return(scalc.NewIterableSlice([]int{2, 3, 4}), nil, nil).Times(1)
+		fileMock.EXPECT().Iterator("c.txt").Return(scalc.NewIterableSlice([]int{1, 2, 3, 4, 5}), nil, nil).Times(1)
 
 		actual, err := calculator.evaluate(&parser.Expression{
 			Operator: scalc.OpLE,
