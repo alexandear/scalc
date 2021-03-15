@@ -1,4 +1,4 @@
-package internal
+package calc
 
 import (
 	"fmt"
@@ -6,11 +6,12 @@ import (
 
 	"go.uber.org/multierr"
 
+	"github.com/alexandear/scalc/internal/parser"
 	"github.com/alexandear/scalc/pkg/scalc"
 )
 
 type Parser interface {
-	Parse(s string) (*scalc.Expression, error)
+	Parse(s string) (*parser.Expression, error)
 }
 
 type FileToIterator interface {
@@ -44,7 +45,7 @@ func (c *Calculator) Calculate(expression string) (scalc.Iterator, error) {
 	return it, nil
 }
 
-func (c *Calculator) evaluate(expr *scalc.Expression) (scalc.Iterator, error) {
+func (c *Calculator) evaluate(expr *parser.Expression) (scalc.Iterator, error) {
 	var iters []scalc.Iterator
 
 	for _, s := range expr.Sets {
@@ -78,5 +79,5 @@ func (c *Calculator) Close() error {
 		err = multierr.Append(err, c.Close())
 	}
 
-	return err
+	return err // nolint:wrapcheck // as is
 }

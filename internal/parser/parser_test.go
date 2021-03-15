@@ -1,10 +1,12 @@
-package scalc
+package parser
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/alexandear/scalc/pkg/scalc"
 )
 
 func TestParse(t *testing.T) {
@@ -16,7 +18,7 @@ func TestParse(t *testing.T) {
 			"one set": {
 				str: `[ GR 1 a.txt ]`,
 				expected: &Expression{
-					Operator: OpGR,
+					Operator: scalc.OpGR,
 					N:        1,
 					Sets: []*Set{
 						{File: newFile("a.txt")},
@@ -26,7 +28,7 @@ func TestParse(t *testing.T) {
 			"sets": {
 				str: `[ EQ 2 a.txt b.txt ]`,
 				expected: &Expression{
-					Operator: OpEQ,
+					Operator: scalc.OpEQ,
 					N:        2,
 					Sets: []*Set{
 						{File: newFile("a.txt")},
@@ -37,13 +39,13 @@ func TestParse(t *testing.T) {
 			"sets with sub expression": {
 				str: `[ EQ 2 a.txt b.txt [ LE 5 a.txt b.txt ] d.txt ]`,
 				expected: &Expression{
-					Operator: OpEQ,
+					Operator: scalc.OpEQ,
 					N:        2,
 					Sets: []*Set{
 						{File: newFile("a.txt")},
 						{File: newFile("b.txt")},
 						{SubExpression: &Expression{
-							Operator: OpLE,
+							Operator: scalc.OpLE,
 							N:        5,
 							Sets: []*Set{
 								{File: newFile("a.txt")},
@@ -57,7 +59,7 @@ func TestParse(t *testing.T) {
 			"spaces": {
 				str: ` [GR  1 a.txt     c.txt  ]   `,
 				expected: &Expression{
-					Operator: OpGR,
+					Operator: scalc.OpGR,
 					N:        1,
 					Sets: []*Set{
 						{File: newFile("a.txt")},
@@ -68,12 +70,12 @@ func TestParse(t *testing.T) {
 			"predefined 1 expression": {
 				str: `[ GR 1 c.txt [ EQ 3 a.txt a.txt b.txt ] ]`,
 				expected: &Expression{
-					Operator: OpGR,
+					Operator: scalc.OpGR,
 					N:        1,
 					Sets: []*Set{
 						{File: newFile("c.txt")},
 						{SubExpression: &Expression{
-							Operator: OpEQ,
+							Operator: scalc.OpEQ,
 							N:        3,
 							Sets: []*Set{
 								{File: newFile("a.txt")},
@@ -87,12 +89,12 @@ func TestParse(t *testing.T) {
 			"predefined 2 expression": {
 				str: `[ LE 2 a.txt [ GR 1 b.txt c.txt ] ]`,
 				expected: &Expression{
-					Operator: OpLE,
+					Operator: scalc.OpLE,
 					N:        2,
 					Sets: []*Set{
 						{File: newFile("a.txt")},
 						{SubExpression: &Expression{
-							Operator: OpGR,
+							Operator: scalc.OpGR,
 							N:        1,
 							Sets: []*Set{
 								{File: newFile("b.txt")},
@@ -105,14 +107,14 @@ func TestParse(t *testing.T) {
 			"complex expression": {
 				str: `[ LE 3 a.txt b.txt c.txt [ GR 1 d.txt e.txt ] [ EQ 2 f.txt [ LE 1 g.txt h.txt ] ] ]`,
 				expected: &Expression{
-					Operator: OpLE,
+					Operator: scalc.OpLE,
 					N:        3,
 					Sets: []*Set{
 						{File: newFile("a.txt")},
 						{File: newFile("b.txt")},
 						{File: newFile("c.txt")},
 						{SubExpression: &Expression{
-							Operator: OpGR,
+							Operator: scalc.OpGR,
 							N:        1,
 							Sets: []*Set{
 								{File: newFile("d.txt")},
@@ -120,12 +122,12 @@ func TestParse(t *testing.T) {
 							},
 						}},
 						{SubExpression: &Expression{
-							Operator: OpEQ,
+							Operator: scalc.OpEQ,
 							N:        2,
 							Sets: []*Set{
 								{File: newFile("f.txt")},
 								{SubExpression: &Expression{
-									Operator: OpLE,
+									Operator: scalc.OpLE,
 									N:        1,
 									Sets: []*Set{
 										{File: newFile("g.txt")},
@@ -196,6 +198,6 @@ func TestParse(t *testing.T) {
 	})
 }
 
-func newFile(name string) *string {
-	return &name
+func newFile(file string) *string {
+	return &file
 }

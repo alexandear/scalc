@@ -1,4 +1,4 @@
-package scalc
+package parser
 
 import (
 	"errors"

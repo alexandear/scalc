@@ -9,7 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/alexandear/scalc/internal"
+	"github.com/alexandear/scalc/internal/calc"
+	"github.com/alexandear/scalc/internal/parser"
 	"github.com/alexandear/scalc/pkg/scalc"
 )
 
@@ -21,18 +22,18 @@ func Execute(args []string) (string, error) {
 	}
 
 	exprArg := strings.Join(args[1:], " ")
-	parser := scalc.NewParser()
+	pars := parser.NewParser()
 
 	var res strings.Builder
 
-	calc := internal.NewCalculator(parser, &fileToIterator{})
+	calculator := calc.NewCalculator(pars, &fileToIterator{})
 	defer func() {
-		if err := calc.Close(); err != nil {
+		if err := calculator.Close(); err != nil {
 			log.Printf("failed to close calculator: %v", err)
 		}
 	}()
 
-	resIt, err := calc.Calculate(exprArg)
+	resIt, err := calculator.Calculate(exprArg)
 	if err != nil {
 		return "", fmt.Errorf("failed to calculate: %w", err)
 	}
@@ -58,7 +59,7 @@ func (f *fileToIterator) Iterator(file string) (scalc.Iterator, io.Closer, error
 		return nil, nil, fmt.Errorf("open file: %w", err)
 	}
 
-	return internal.NewIterableReader(fi), fi, nil
+	return calc.NewIterableReader(fi), fi, nil
 }
 
 func usage(appName string) string {

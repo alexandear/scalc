@@ -1,4 +1,4 @@
-package internal
+package calc
 
 import (
 	"testing"
@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/alexandear/scalc/internal/parser"
 	"github.com/alexandear/scalc/pkg/scalc"
 )
 
@@ -14,15 +15,15 @@ func Test_evaluate(t *testing.T) {
 		calculator := &Calculator{}
 		defer calculator.Close()
 
-		actual, err := calculator.evaluate(&scalc.Expression{
+		actual, err := calculator.evaluate(&parser.Expression{
 			Operator: scalc.OpGR,
 			N:        1,
-			Sets: []*scalc.Set{
+			Sets: []*parser.Set{
 				{File: newFile("c.txt")},
-				{SubExpression: &scalc.Expression{
+				{SubExpression: &parser.Expression{
 					Operator: scalc.OpEQ,
 					N:        3,
-					Sets: []*scalc.Set{
+					Sets: []*parser.Set{
 						{File: newFile("a.txt")},
 						{File: newFile("a.txt")},
 						{File: newFile("b.txt")},
@@ -39,15 +40,15 @@ func Test_evaluate(t *testing.T) {
 		calculator := &Calculator{}
 		defer calculator.Close()
 
-		actual, err := calculator.evaluate(&scalc.Expression{
+		actual, err := calculator.evaluate(&parser.Expression{
 			Operator: scalc.OpLE,
 			N:        2,
-			Sets: []*scalc.Set{
+			Sets: []*parser.Set{
 				{File: newFile("a.txt")},
-				{SubExpression: &scalc.Expression{
+				{SubExpression: &parser.Expression{
 					Operator: scalc.OpGR,
 					N:        1,
-					Sets: []*scalc.Set{
+					Sets: []*parser.Set{
 						{File: newFile("b.txt")},
 						{File: newFile("c.txt")},
 					},

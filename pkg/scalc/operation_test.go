@@ -14,21 +14,21 @@ func TestCalculateInefficient(t *testing.T) {
 	testCalculate(t, calculateInefficient)
 }
 
-func testCalculate(t *testing.T, performFunc func(opFunc OpFunc, n uint, sets []Iterator) Iterator) {
+func testCalculate(t *testing.T, performFunc func(opFunc opFunc, n uint, sets []Iterator) Iterator) {
 	for name, tc := range map[string]struct {
-		opFunc   OpFunc
+		opFunc   opFunc
 		n        uint
 		sets     []Iterator
 		expected Iterator
 	}{
 		"LE N=1 one set": {
-			opFunc:   OpFuncLE,
+			opFunc:   opFuncLE,
 			n:        1,
 			sets:     []Iterator{NewIterableSlice([]int{1, 2, 3})},
 			expected: NewIterableSlice(nil),
 		},
 		"LE N=1 two sets": {
-			opFunc: OpFuncLE,
+			opFunc: opFuncLE,
 			n:      1,
 			sets: []Iterator{
 				NewIterableSlice([]int{1, 2, 3}),
@@ -37,13 +37,13 @@ func testCalculate(t *testing.T, performFunc func(opFunc OpFunc, n uint, sets []
 			expected: NewIterableSlice(nil),
 		},
 		"LE N>1 one set": {
-			opFunc:   OpFuncLE,
+			opFunc:   opFuncLE,
 			n:        3,
 			sets:     []Iterator{NewIterableSlice([]int{1, 2, 3})},
 			expected: NewIterableSlice([]int{1, 2, 3}),
 		},
 		"LE N=2 two sets equal size": {
-			opFunc: OpFuncLE,
+			opFunc: opFuncLE,
 			n:      2,
 			sets: []Iterator{
 				NewIterableSlice([]int{1, 2, 3}),
@@ -52,7 +52,7 @@ func testCalculate(t *testing.T, performFunc func(opFunc OpFunc, n uint, sets []
 			expected: NewIterableSlice([]int{1, 4}),
 		},
 		"LE N=2 two sets small size=1": {
-			opFunc: OpFuncLE,
+			opFunc: opFuncLE,
 			n:      2,
 			sets: []Iterator{
 				NewIterableSlice([]int{1}),
@@ -61,7 +61,7 @@ func testCalculate(t *testing.T, performFunc func(opFunc OpFunc, n uint, sets []
 			expected: NewIterableSlice([]int{1, 2}),
 		},
 		"LE N=2 two sets different size": {
-			opFunc: OpFuncLE,
+			opFunc: opFuncLE,
 			n:      2,
 			sets: []Iterator{
 				NewIterableSlice([]int{1}),
@@ -70,7 +70,7 @@ func testCalculate(t *testing.T, performFunc func(opFunc OpFunc, n uint, sets []
 			expected: NewIterableSlice([]int{1, 2, 3}),
 		},
 		"LE N=2 three sets": {
-			opFunc: OpFuncLE,
+			opFunc: opFuncLE,
 			n:      2,
 			sets: []Iterator{
 				NewIterableSlice([]int{1, 2, 4, 5, 6}),
@@ -80,7 +80,7 @@ func testCalculate(t *testing.T, performFunc func(opFunc OpFunc, n uint, sets []
 			expected: NewIterableSlice([]int{-1, 0, 2, 3, 4, 7, 8, 9, 10}),
 		},
 		"GR N=1 two sets first has less size than a second": {
-			opFunc: OpFuncGR,
+			opFunc: opFuncGR,
 			n:      1,
 			sets: []Iterator{
 				NewIterableSlice([]int{2, 3, 4}),
@@ -89,7 +89,7 @@ func testCalculate(t *testing.T, performFunc func(opFunc OpFunc, n uint, sets []
 			expected: NewIterableSlice([]int{2, 3, 4}),
 		},
 		"GR N=1 two sets second has less size than a first": {
-			opFunc: OpFuncGR,
+			opFunc: opFuncGR,
 			n:      1,
 			sets: []Iterator{
 				NewIterableSlice([]int{1, 2, 3, 4, 5}),
@@ -98,7 +98,7 @@ func testCalculate(t *testing.T, performFunc func(opFunc OpFunc, n uint, sets []
 			expected: NewIterableSlice([]int{2, 3}),
 		},
 		"GR N=1 three sets": {
-			opFunc: OpFuncGR,
+			opFunc: opFuncGR,
 			n:      1,
 			sets: []Iterator{
 				NewIterableSlice([]int{1, 2, 4, 5, 6}),
@@ -108,13 +108,13 @@ func testCalculate(t *testing.T, performFunc func(opFunc OpFunc, n uint, sets []
 			expected: NewIterableSlice([]int{1, 5, 6}),
 		},
 		"EQ N=1 one set": {
-			opFunc:   OpFuncEQ,
+			opFunc:   opFuncEQ,
 			n:        1,
 			sets:     []Iterator{NewIterableSlice([]int{1, 2, 3})},
 			expected: NewIterableSlice([]int{1, 2, 3}),
 		},
 		"EQ N=3 three sets": {
-			opFunc: OpFuncEQ,
+			opFunc: opFuncEQ,
 			n:      3,
 			sets: []Iterator{
 				NewIterableSlice([]int{1, 2, 3}),
@@ -124,7 +124,7 @@ func testCalculate(t *testing.T, performFunc func(opFunc OpFunc, n uint, sets []
 			expected: NewIterableSlice([]int{2, 3}),
 		},
 		"EQ N=1 three sets": {
-			opFunc: OpFuncEQ,
+			opFunc: opFuncEQ,
 			n:      1,
 			sets: []Iterator{
 				NewIterableSlice([]int{1, 2, 4, 5, 6}),

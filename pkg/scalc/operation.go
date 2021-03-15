@@ -5,22 +5,40 @@ import (
 	"sort"
 )
 
+type Operator string
+
+const (
+	OpEQ Operator = "EQ"
+	OpLE Operator = "LE"
+	OpGR Operator = "GR"
+)
+
+type opFunc func(cnt, n uint) bool
+
+func opFuncEQ(cnt, n uint) bool { return cnt == n }
+
+func opFuncLE(cnt, n uint) bool { return cnt < n }
+
+func opFuncGR(cnt, n uint) bool { return cnt > n }
+
 type Iterator interface {
 	Next() (value int, ok bool)
 }
 
-type OpFunc func(cnt, n uint) bool
+func Calculate(operator Operator, n uint, iters []Iterator) Iterator {
+	opFn := opFuncEQ
 
-func OpFuncEQ(cnt, n uint) bool {
-	return cnt == n
-}
+	switch operator {
+	case OpEQ:
+		opFn = opFuncEQ
+	case OpLE:
+		opFn = opFuncLE
+	case OpGR:
+		opFn = opFuncGR
+	default:
+	}
 
-func OpFuncLE(cnt, n uint) bool {
-	return cnt < n
-}
-
-func OpFuncGR(cnt, n uint) bool {
-	return cnt > n
+	return calculate(opFn, n, iters)
 }
 
 type Pair struct {
@@ -28,23 +46,7 @@ type Pair struct {
 	Idx   int
 }
 
-func Calculate(operator Operator, n uint, iters []Iterator) Iterator {
-	opFunc := OpFuncEQ
-
-	switch operator {
-	case OpEQ:
-		opFunc = OpFuncEQ
-	case OpLE:
-		opFunc = OpFuncLE
-	case OpGR:
-		opFunc = OpFuncGR
-	default:
-	}
-
-	return calculate(opFunc, n, iters)
-}
-
-func calculate(opFunc OpFunc, n uint, iters []Iterator) Iterator {
+func calculate(opFn opFunc, n uint, iters []Iterator) Iterator {
 	operationLine := make([]Pair, 0, len(iters))
 	for i := range iters {
 		operationLine = append(operationLine, Pair{Idx: i})
@@ -83,7 +85,7 @@ func calculate(opFunc OpFunc, n uint, iters []Iterator) Iterator {
 			operationLine = append(operationLine, vi)
 		}
 
-		if opFunc(cnt, n) {
+		if opFn(cnt, n) {
 			result = append(result, min.Value)
 		}
 	}
@@ -91,7 +93,23 @@ func calculate(opFunc OpFunc, n uint, iters []Iterator) Iterator {
 	return NewIterableSlice(result)
 }
 
-func calculateInefficient(opFunc OpFunc, n uint, iters []Iterator) Iterator {
+func CalculateInefficient(operator Operator, n uint, iters []Iterator) Iterator {
+	opFn := opFuncEQ
+
+	switch operator {
+	case OpEQ:
+		opFn = opFuncEQ
+	case OpLE:
+		opFn = opFuncLE
+	case OpGR:
+		opFn = opFuncGR
+	default:
+	}
+
+	return calculateInefficient(opFn, n, iters)
+}
+
+func calculateInefficient(opFunc opFunc, n uint, iters []Iterator) Iterator {
 	counts := make(map[int]uint, len(iters))
 
 	for _, iter := range iters {

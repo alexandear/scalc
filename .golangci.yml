@@ -38,3 +38,9 @@ issues:
     - linters:
         - lll
       source: "^//go:generate "
+    - linters:
+        - deadcode
+      text: "`calculateInefficient` is unused"
+    - linters:
+        - unused
+      text: "func `calculateInefficient` is unused"
