@@ -1,4 +1,4 @@
-package main
+package scalc
 
 type IterableSlice struct {
 	idx int

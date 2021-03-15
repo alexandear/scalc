@@ -1,4 +1,4 @@
-package main
+package scalc
 
 // PairHeap is a min-heap of Pair values comparing by Pair.Value.
 type PairHeap []Pair
