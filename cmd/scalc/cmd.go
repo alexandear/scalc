@@ -3,15 +3,12 @@ package main
 import (
 	"errors"
 	"fmt"
-	"io"
 	"log"
-	"os"
 	"strconv"
 	"strings"
 
 	"github.com/alexandear/scalc/internal/calc"
 	"github.com/alexandear/scalc/internal/parser"
-	"github.com/alexandear/scalc/pkg/scalc"
 )
 
 func Execute(args []string) (string, error) {
@@ -26,7 +23,7 @@ func Execute(args []string) (string, error) {
 
 	var res strings.Builder
 
-	calculator := calc.NewCalculator(pars, &fileToIterator{})
+	calculator := calc.NewCalculator(pars, &calc.FileIteratorImpl{})
 	defer func() {
 		if err := calculator.Close(); err != nil {
 			log.Printf("failed to close calculator: %v", err)
@@ -38,28 +35,12 @@ func Execute(args []string) (string, error) {
 		return "", fmt.Errorf("failed to calculate: %w", err)
 	}
 
-	for {
-		v, ok := resIt.Next()
-		if !ok {
-			break
-		}
-
+	for v, ok := resIt.Next(); ok; v, ok = resIt.Next() {
 		res.WriteString(strconv.Itoa(v))
 		res.WriteRune('\n')
 	}
 
 	return res.String(), nil
-}
-
-type fileToIterator struct{}
-
-func (f *fileToIterator) Iterator(file string) (scalc.Iterator, io.Closer, error) {
-	fi, err := os.Open(file)
-	if err != nil {
-		return nil, nil, fmt.Errorf("open file: %w", err)
-	}
-
-	return calc.NewIterableReader(fi), fi, nil
 }
 
 func usage(appName string) string {

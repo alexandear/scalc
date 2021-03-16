@@ -16,17 +16,17 @@ type Parser interface {
 	Parse(s string) (*parser.Expression, error)
 }
 
-type FileToIterator interface {
+type FileIterator interface {
 	Iterator(file string) (scalc.Iterator, io.Closer, error)
 }
 
 type Calculator struct {
 	parser   Parser
-	fileIter FileToIterator
+	fileIter FileIterator
 	closers  []io.Closer
 }
 
-func NewCalculator(parser Parser, fileIter FileToIterator) *Calculator {
+func NewCalculator(parser Parser, fileIter FileIterator) *Calculator {
 	return &Calculator{
 		parser:   parser,
 		fileIter: fileIter,

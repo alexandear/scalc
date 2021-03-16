@@ -50,31 +50,31 @@ func (mr *MockParserMockRecorder) Parse(s interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Parse", reflect.TypeOf((*MockParser)(nil).Parse), s)
 }
 
-// MockFileToIterator is a mock of FileToIterator interface
-type MockFileToIterator struct {
+// MockFileIterator is a mock of FileIterator interface
+type MockFileIterator struct {
 	ctrl     *gomock.Controller
-	recorder *MockFileToIteratorMockRecorder
+	recorder *MockFileIteratorMockRecorder
 }
 
-// MockFileToIteratorMockRecorder is the mock recorder for MockFileToIterator
-type MockFileToIteratorMockRecorder struct {
-	mock *MockFileToIterator
+// MockFileIteratorMockRecorder is the mock recorder for MockFileIterator
+type MockFileIteratorMockRecorder struct {
+	mock *MockFileIterator
 }
 
-// NewMockFileToIterator creates a new mock instance
-func NewMockFileToIterator(ctrl *gomock.Controller) *MockFileToIterator {
-	mock := &MockFileToIterator{ctrl: ctrl}
-	mock.recorder = &MockFileToIteratorMockRecorder{mock}
+// NewMockFileIterator creates a new mock instance
+func NewMockFileIterator(ctrl *gomock.Controller) *MockFileIterator {
+	mock := &MockFileIterator{ctrl: ctrl}
+	mock.recorder = &MockFileIteratorMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockFileToIterator) EXPECT() *MockFileToIteratorMockRecorder {
+func (m *MockFileIterator) EXPECT() *MockFileIteratorMockRecorder {
 	return m.recorder
 }
 
 // Iterator mocks base method
-func (m *MockFileToIterator) Iterator(file string) (scalc.Iterator, io.Closer, error) {
+func (m *MockFileIterator) Iterator(file string) (scalc.Iterator, io.Closer, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Iterator", file)
 	ret0, _ := ret[0].(scalc.Iterator)
@@ -84,7 +84,7 @@ func (m *MockFileToIterator) Iterator(file string) (scalc.Iterator, io.Closer, e
 }
 
 // Iterator indicates an expected call of Iterator
-func (mr *MockFileToIteratorMockRecorder) Iterator(file interface{}) *gomock.Call {
+func (mr *MockFileIteratorMockRecorder) Iterator(file interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Iterator", reflect.TypeOf((*MockFileToIterator)(nil).Iterator), file)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Iterator", reflect.TypeOf((*MockFileIterator)(nil).Iterator), file)
 }

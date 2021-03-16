@@ -9,20 +9,20 @@ import (
 	"strconv"
 )
 
-type IterableReader struct {
+type iterableReader struct {
 	scanner *bufio.Scanner
 }
 
-func NewIterableReader(r io.Reader) *IterableReader {
+func newIterableReader(r io.Reader) *iterableReader {
 	scanner := bufio.NewScanner(r)
 	scanner.Split(bufio.ScanLines)
 
-	return &IterableReader{
+	return &iterableReader{
 		scanner: scanner,
 	}
 }
 
-func (r *IterableReader) Next() (value int, ok bool) {
+func (r *iterableReader) Next() (value int, ok bool) {
 	n, err := r.readInt()
 
 	if errors.Is(err, io.EOF) {
@@ -34,7 +34,7 @@ func (r *IterableReader) Next() (value int, ok bool) {
 	return n, true
 }
 
-func (r *IterableReader) readInt() (int, error) {
+func (r *iterableReader) readInt() (int, error) {
 	cont := r.scanner.Scan()
 
 	if err := r.scanner.Err(); err != nil {

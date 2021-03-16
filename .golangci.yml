@@ -39,8 +39,5 @@ issues:
         - lll
       source: "^//go:generate "
     - linters:
-        - deadcode
-      text: "`calculateInefficient` is unused"
-    - linters:
-        - unused
-      text: "func `calculateInefficient` is unused"
+        - wastedassign
+      path: "cmd/scalc/cmd.go"

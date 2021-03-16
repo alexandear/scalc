@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestCalculate(t *testing.T) {
@@ -16,120 +17,125 @@ func TestCalculate(t *testing.T) {
 		"LE N=1 one set": {
 			operator: OpLE,
 			n:        1,
-			sets:     []Iterator{NewIterableSlice([]int{1, 2, 3})},
-			expected: NewIterableSlice(nil),
+			sets:     []Iterator{newIterableSlice([]int{1, 2, 3})},
+			expected: newIterableSlice(nil),
 		},
 		"LE N=1 two sets": {
 			operator: OpLE,
 			n:        1,
 			sets: []Iterator{
-				NewIterableSlice([]int{1, 2, 3}),
-				NewIterableSlice([]int{2, 3, 4}),
+				newIterableSlice([]int{1, 2, 3}),
+				newIterableSlice([]int{2, 3, 4}),
 			},
-			expected: NewIterableSlice(nil),
+			expected: newIterableSlice(nil),
 		},
 		"LE N>1 one set": {
 			operator: OpLE,
 			n:        3,
-			sets:     []Iterator{NewIterableSlice([]int{1, 2, 3})},
-			expected: NewIterableSlice([]int{1, 2, 3}),
+			sets:     []Iterator{newIterableSlice([]int{1, 2, 3})},
+			expected: newIterableSlice([]int{1, 2, 3}),
 		},
 		"LE N=2 two sets equal size": {
 			operator: OpLE,
 			n:        2,
 			sets: []Iterator{
-				NewIterableSlice([]int{1, 2, 3}),
-				NewIterableSlice([]int{2, 3, 4}),
+				newIterableSlice([]int{1, 2, 3}),
+				newIterableSlice([]int{2, 3, 4}),
 			},
-			expected: NewIterableSlice([]int{1, 4}),
+			expected: newIterableSlice([]int{1, 4}),
 		},
 		"LE N=2 two sets small size=1": {
 			operator: OpLE,
 			n:        2,
 			sets: []Iterator{
-				NewIterableSlice([]int{1}),
-				NewIterableSlice([]int{2}),
+				newIterableSlice([]int{1}),
+				newIterableSlice([]int{2}),
 			},
-			expected: NewIterableSlice([]int{1, 2}),
+			expected: newIterableSlice([]int{1, 2}),
 		},
 		"LE N=2 two sets different size": {
 			operator: OpLE,
 			n:        2,
 			sets: []Iterator{
-				NewIterableSlice([]int{1}),
-				NewIterableSlice([]int{2, 3}),
+				newIterableSlice([]int{1}),
+				newIterableSlice([]int{2, 3}),
 			},
-			expected: NewIterableSlice([]int{1, 2, 3}),
+			expected: newIterableSlice([]int{1, 2, 3}),
 		},
 		"LE N=2 three sets": {
 			operator: OpLE,
 			n:        2,
 			sets: []Iterator{
-				NewIterableSlice([]int{1, 2, 4, 5, 6}),
-				NewIterableSlice([]int{-1, 0, 3, 5}),
-				NewIterableSlice([]int{1, 6, 7, 8, 9, 10}),
+				newIterableSlice([]int{1, 2, 4, 5, 6}),
+				newIterableSlice([]int{-1, 0, 3, 5}),
+				newIterableSlice([]int{1, 6, 7, 8, 9, 10}),
 			},
-			expected: NewIterableSlice([]int{-1, 0, 2, 3, 4, 7, 8, 9, 10}),
+			expected: newIterableSlice([]int{-1, 0, 2, 3, 4, 7, 8, 9, 10}),
 		},
 		"GR N=1 two sets first has less size than a second": {
 			operator: OpGR,
 			n:        1,
 			sets: []Iterator{
-				NewIterableSlice([]int{2, 3, 4}),
-				NewIterableSlice([]int{1, 2, 3, 4, 5}),
+				newIterableSlice([]int{2, 3, 4}),
+				newIterableSlice([]int{1, 2, 3, 4, 5}),
 			},
-			expected: NewIterableSlice([]int{2, 3, 4}),
+			expected: newIterableSlice([]int{2, 3, 4}),
 		},
 		"GR N=1 two sets second has less size than a first": {
 			operator: OpGR,
 			n:        1,
 			sets: []Iterator{
-				NewIterableSlice([]int{1, 2, 3, 4, 5}),
-				NewIterableSlice([]int{2, 3}),
+				newIterableSlice([]int{1, 2, 3, 4, 5}),
+				newIterableSlice([]int{2, 3}),
 			},
-			expected: NewIterableSlice([]int{2, 3}),
+			expected: newIterableSlice([]int{2, 3}),
 		},
 		"GR N=1 three sets": {
 			operator: OpGR,
 			n:        1,
 			sets: []Iterator{
-				NewIterableSlice([]int{1, 2, 4, 5, 6}),
-				NewIterableSlice([]int{-1, 0, 3, 5}),
-				NewIterableSlice([]int{1, 6, 7, 8, 9, 10}),
+				newIterableSlice([]int{1, 2, 4, 5, 6}),
+				newIterableSlice([]int{-1, 0, 3, 5}),
+				newIterableSlice([]int{1, 6, 7, 8, 9, 10}),
 			},
-			expected: NewIterableSlice([]int{1, 5, 6}),
+			expected: newIterableSlice([]int{1, 5, 6}),
 		},
 		"EQ N=1 one set": {
 			operator: OpEQ,
 			n:        1,
-			sets:     []Iterator{NewIterableSlice([]int{1, 2, 3})},
-			expected: NewIterableSlice([]int{1, 2, 3}),
+			sets:     []Iterator{newIterableSlice([]int{1, 2, 3})},
+			expected: newIterableSlice([]int{1, 2, 3}),
 		},
 		"EQ N=3 three sets": {
 			operator: OpEQ,
 			n:        3,
 			sets: []Iterator{
-				NewIterableSlice([]int{1, 2, 3}),
-				NewIterableSlice([]int{1, 2, 3}),
-				NewIterableSlice([]int{2, 3}),
+				newIterableSlice([]int{1, 2, 3}),
+				newIterableSlice([]int{1, 2, 3}),
+				newIterableSlice([]int{2, 3}),
 			},
-			expected: NewIterableSlice([]int{2, 3}),
+			expected: newIterableSlice([]int{2, 3}),
 		},
 		"EQ N=1 three sets": {
 			operator: OpEQ,
 			n:        1,
 			sets: []Iterator{
-				NewIterableSlice([]int{1, 2, 4, 5, 6}),
-				NewIterableSlice([]int{-1, 0, 3, 5}),
-				NewIterableSlice([]int{1, 6, 7, 8, 9, 10}),
+				newIterableSlice([]int{1, 2, 4, 5, 6}),
+				newIterableSlice([]int{-1, 0, 3, 5}),
+				newIterableSlice([]int{1, 6, 7, 8, 9, 10}),
 			},
-			expected: NewIterableSlice([]int{-1, 0, 2, 3, 4, 7, 8, 9, 10}),
+			expected: newIterableSlice([]int{-1, 0, 2, 3, 4, 7, 8, 9, 10}),
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
-			actual := Calculate(tc.operator, tc.n, tc.sets)
+			iter := Calculate(tc.operator, tc.n, tc.sets)
 
-			assert.Equal(t, tc.expected, actual)
+			for expected, ok := tc.expected.Next(); ok; expected, ok = tc.expected.Next() {
+				actual, actualOK := iter.Next()
+
+				require.True(t, actualOK)
+				assert.Equal(t, expected, actual)
+			}
 		})
 	}
 }
@@ -203,8 +209,31 @@ func benchmarkCalculate(size int, calculate func(operator Operator, n uint, iter
 	var r Iterator
 
 	for n := 0; n < b.N; n++ {
-		r = calculate(OpEQ, 2, []Iterator{NewIterableSlice(arrA), NewIterableSlice(arrB)})
+		r = calculate(OpEQ, 2, []Iterator{newIterableSlice(arrA), newIterableSlice(arrB)})
 	}
 
 	res = r
+}
+
+type iterableSlice struct {
+	idx int
+	s   []int
+}
+
+func newIterableSlice(s []int) *iterableSlice {
+	if s == nil {
+		s = []int{}
+	}
+
+	return &iterableSlice{-1, s}
+}
+
+func (s *iterableSlice) Next() (value int, ok bool) {
+	s.idx++
+
+	if s.idx >= len(s.s) {
+		return 0, false
+	}
+
+	return s.s[s.idx], true
 }
