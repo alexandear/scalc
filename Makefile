@@ -36,6 +36,11 @@ test:
 	@echo test
 	@go test -race -v -count=1 ./...
 
+.PHONY: test-it
+test-it:
+	@echo test-it
+	@go test -race -v -count=1 --tags=integration ./test/...
+
 .PHONY: generate
 generate: mock
 

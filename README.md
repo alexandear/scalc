@@ -93,10 +93,16 @@ Or with `docker`:
 docker run --rm scalc [ GR 1 c.txt [ EQ 3 a.txt a.txt b.txt ] ]
 ```
 
-### How to Execute Tests
+### How to Execute Unit Tests
 
 ```shell
 make test
+```
+
+### How to Execute Integration Tests
+
+```shell
+make test-it
 ```
 
 ### How to Run Linter

@@ -23,7 +23,7 @@ func Execute(args []string) (string, error) {
 
 	var res strings.Builder
 
-	calculator := calc.NewCalculator(pars, &calc.FileIteratorImpl{})
+	calculator := calc.NewCalculator(pars, calc.NewFileIterator())
 	defer func() {
 		if err := calculator.Close(); err != nil {
 			log.Printf("failed to close calculator: %v", err)
