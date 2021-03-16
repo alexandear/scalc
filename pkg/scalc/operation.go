@@ -16,11 +16,6 @@ type Iterator interface {
 	Next() (value int, ok bool)
 }
 
-type Pair struct {
-	Value int
-	Idx   int
-}
-
 func Calculate(operator Operator, n uint, iters []Iterator) Iterator {
 	res := make(chan int)
 
@@ -32,50 +27,43 @@ func Calculate(operator Operator, n uint, iters []Iterator) Iterator {
 	return &iterableChannel{Chan: res}
 }
 
-type iterableChannel struct {
-	Chan <-chan int
-}
-
-func (c *iterableChannel) Next() (value int, ok bool) {
-	value, ok = <-c.Chan
-
-	return value, ok
-}
-
 func calculate(operator Operator, n uint, iters []Iterator, res chan<- int) {
-	pairHeap := make(PairHeap, len(iters))
+	queue := make(PriorityQueue, len(iters))
 
 	for idx, iter := range iters {
-		v, ok := iter.Next()
+		priority, ok := iter.Next()
 		if !ok {
 			continue
 		}
 
-		pairHeap[idx] = Pair{Idx: idx, Value: v}
+		queue[idx] = &Item{
+			value:    idx,
+			priority: priority,
+		}
 	}
 
-	heap.Init(&pairHeap)
+	heap.Init(&queue)
 
-	for pairHeap.Len() != 0 {
-		min, _ := heap.Pop(&pairHeap).(Pair)
-		nextIdxes := []int{min.Idx}
+	for queue.Len() != 0 {
+		min, _ := heap.Pop(&queue).(*Item)
+		nextIts := []int{min.value}
 
-		for pairHeap.Len() > 0 && pairHeap[0].Value == min.Value {
-			min, _ = heap.Pop(&pairHeap).(Pair)
-			nextIdxes = append(nextIdxes, min.Idx)
+		for queue.Len() > 0 && queue[0].priority == min.priority {
+			min, _ = heap.Pop(&queue).(*Item)
+			nextIts = append(nextIts, min.value)
 		}
 
-		if cnt := len(nextIdxes); operatorFn(operator)(cnt, n) {
-			res <- min.Value
+		if cnt := len(nextIts); operatorFn(operator)(cnt, n) {
+			res <- min.priority
 		}
 
-		for _, idx := range nextIdxes {
-			v, ok := iters[idx].Next()
+		for _, idx := range nextIts {
+			priority, ok := iters[idx].Next()
 			if !ok {
 				continue
 			}
 
-			heap.Push(&pairHeap, Pair{Idx: idx, Value: v})
+			heap.Push(&queue, &Item{priority: priority, value: idx})
 		}
 	}
 }
@@ -91,4 +79,14 @@ func operatorFn(operator Operator) func(cnt int, n uint) bool {
 	default:
 		return func(cnt int, n uint) bool { return uint(cnt) == n }
 	}
+}
+
+type iterableChannel struct {
+	Chan <-chan int
+}
+
+func (c *iterableChannel) Next() (value int, ok bool) {
+	value, ok = <-c.Chan
+
+	return value, ok
 }

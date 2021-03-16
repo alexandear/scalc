@@ -46,6 +46,31 @@ cat c.txt
 4
 5
 ```
+## Algorithm
+
+1. Create a min priority queue: for each iterator `it`:
+    1. push the pair `(nextIntIn(it), itIdx)`.
+2. For the heap is not empty:
+   1. pop element `min` of the queue;
+      1. continue to pop elements if they are equal to `min`, count `count` popped elements;
+   3. if `operator(count, N)` add `min` to result iterator;
+   4. for all popped elements if `nextIntIn(it)` exists:
+      1. push the pair `(nextIntIn(it), itIdx)`.
+
+Iterator can be a file iterator or a result iterator of other expression.
+
+### Complexity
+
+`K` - total number of iterators, `M` - total number of integers in files.
+
+Time complexity is `K * log(M)`. Because:
+
+- creating a min priority queue and initial adding elements (step 1) - `O(K)`;
+- add or remove element of the queue is `O(log(K))`;
+- `operator` compare is `O(1)`;
+- the whole loop in step 2 is `O(K * log(N))`;
+
+Space complexity is `O(K)`.
 
 ## Development
 

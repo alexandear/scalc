@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestCalculate(t *testing.T) {
@@ -12,13 +11,13 @@ func TestCalculate(t *testing.T) {
 		operator Operator
 		n        uint
 		sets     []Iterator
-		expected Iterator
+		expected []int
 	}{
 		"LE N=1 one set": {
 			operator: OpLE,
 			n:        1,
 			sets:     []Iterator{newIterableSlice([]int{1, 2, 3})},
-			expected: newIterableSlice(nil),
+			expected: nil,
 		},
 		"LE N=1 two sets": {
 			operator: OpLE,
@@ -27,13 +26,13 @@ func TestCalculate(t *testing.T) {
 				newIterableSlice([]int{1, 2, 3}),
 				newIterableSlice([]int{2, 3, 4}),
 			},
-			expected: newIterableSlice(nil),
+			expected: nil,
 		},
 		"LE N>1 one set": {
 			operator: OpLE,
 			n:        3,
 			sets:     []Iterator{newIterableSlice([]int{1, 2, 3})},
-			expected: newIterableSlice([]int{1, 2, 3}),
+			expected: []int{1, 2, 3},
 		},
 		"LE N=2 two sets equal size": {
 			operator: OpLE,
@@ -42,7 +41,7 @@ func TestCalculate(t *testing.T) {
 				newIterableSlice([]int{1, 2, 3}),
 				newIterableSlice([]int{2, 3, 4}),
 			},
-			expected: newIterableSlice([]int{1, 4}),
+			expected: []int{1, 4},
 		},
 		"LE N=2 two sets small size=1": {
 			operator: OpLE,
@@ -51,7 +50,7 @@ func TestCalculate(t *testing.T) {
 				newIterableSlice([]int{1}),
 				newIterableSlice([]int{2}),
 			},
-			expected: newIterableSlice([]int{1, 2}),
+			expected: []int{1, 2},
 		},
 		"LE N=2 two sets different size": {
 			operator: OpLE,
@@ -60,7 +59,7 @@ func TestCalculate(t *testing.T) {
 				newIterableSlice([]int{1}),
 				newIterableSlice([]int{2, 3}),
 			},
-			expected: newIterableSlice([]int{1, 2, 3}),
+			expected: []int{1, 2, 3},
 		},
 		"LE N=2 three sets": {
 			operator: OpLE,
@@ -70,7 +69,7 @@ func TestCalculate(t *testing.T) {
 				newIterableSlice([]int{-1, 0, 3, 5}),
 				newIterableSlice([]int{1, 6, 7, 8, 9, 10}),
 			},
-			expected: newIterableSlice([]int{-1, 0, 2, 3, 4, 7, 8, 9, 10}),
+			expected: []int{-1, 0, 2, 3, 4, 7, 8, 9, 10},
 		},
 		"GR N=1 two sets first has less size than a second": {
 			operator: OpGR,
@@ -79,7 +78,7 @@ func TestCalculate(t *testing.T) {
 				newIterableSlice([]int{2, 3, 4}),
 				newIterableSlice([]int{1, 2, 3, 4, 5}),
 			},
-			expected: newIterableSlice([]int{2, 3, 4}),
+			expected: []int{2, 3, 4},
 		},
 		"GR N=1 two sets second has less size than a first": {
 			operator: OpGR,
@@ -88,7 +87,7 @@ func TestCalculate(t *testing.T) {
 				newIterableSlice([]int{1, 2, 3, 4, 5}),
 				newIterableSlice([]int{2, 3}),
 			},
-			expected: newIterableSlice([]int{2, 3}),
+			expected: []int{2, 3},
 		},
 		"GR N=1 three sets": {
 			operator: OpGR,
@@ -98,13 +97,13 @@ func TestCalculate(t *testing.T) {
 				newIterableSlice([]int{-1, 0, 3, 5}),
 				newIterableSlice([]int{1, 6, 7, 8, 9, 10}),
 			},
-			expected: newIterableSlice([]int{1, 5, 6}),
+			expected: []int{1, 5, 6},
 		},
 		"EQ N=1 one set": {
 			operator: OpEQ,
 			n:        1,
 			sets:     []Iterator{newIterableSlice([]int{1, 2, 3})},
-			expected: newIterableSlice([]int{1, 2, 3}),
+			expected: []int{1, 2, 3},
 		},
 		"EQ N=3 three sets": {
 			operator: OpEQ,
@@ -114,7 +113,7 @@ func TestCalculate(t *testing.T) {
 				newIterableSlice([]int{1, 2, 3}),
 				newIterableSlice([]int{2, 3}),
 			},
-			expected: newIterableSlice([]int{2, 3}),
+			expected: []int{2, 3},
 		},
 		"EQ N=1 three sets": {
 			operator: OpEQ,
@@ -124,18 +123,17 @@ func TestCalculate(t *testing.T) {
 				newIterableSlice([]int{-1, 0, 3, 5}),
 				newIterableSlice([]int{1, 6, 7, 8, 9, 10}),
 			},
-			expected: newIterableSlice([]int{-1, 0, 2, 3, 4, 7, 8, 9, 10}),
+			expected: []int{-1, 0, 2, 3, 4, 7, 8, 9, 10},
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
 			iter := Calculate(tc.operator, tc.n, tc.sets)
 
-			for expected, ok := tc.expected.Next(); ok; expected, ok = tc.expected.Next() {
-				actual, actualOK := iter.Next()
-
-				require.True(t, actualOK)
-				assert.Equal(t, expected, actual)
+			var actual []int
+			for v, ok := iter.Next(); ok; v, ok = iter.Next() {
+				actual = append(actual, v)
 			}
+			assert.Equal(t, tc.expected, actual)
 		})
 	}
 }
